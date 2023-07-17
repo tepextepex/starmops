@@ -1,16 +1,18 @@
 from pgzero.actor import Actor
 # from pgzero.game import screen  # game won't start with this import line
 from pygame import Rect
+from hero_skills import *
 from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
-from gui import SkillsPanel, InfoPanel, QueuePanel, SlotsPanel, HeroPanel, EnemyPanel
+from gui import MainMenu, SkillsPanel, InfoPanel, QueuePanel, SlotsPanel, HeroPanel, EnemyPanel
 
 WIDTH = 640
 HEIGHT = 480
 padding = 10
 
 MODE = "menu"
+main_menu = MainMenu(WIDTH, HEIGHT)
 
 background = Actor("purple_space")
 
@@ -26,18 +28,27 @@ battle_btn.bottomright = WIDTH - padding, HEIGHT
 green = Char("Hodor", "alien_green",
              "Hodor is the tank. THE tank. He is a tough guy who defends his dudes",
              7, 3, 10, 5)
+green.learn(melee_attack, hold)
+
 blue = Char("Jebediah", "alien_blue",
             "Jebediah is a jebedi knight. Wily and agile, he prefers melee combat using lasersabers",
             3, 10, 7, 5)
+blue.learn(melee_attack, ranged_attack)
+
 pink = Char("Scarface", "alien_pink",
             "Scarface is always smiling, but don't fall for this. He is fierce and adores to dismember his opponents",
             10, 5, 7, 3)
+pink.learn(melee_attack)
+
 yellow = Char("Eastwood", "alien_yellow",
               "A gunslinger without a name. Everybody calls him Eastwood but we have no idea why",
               3, 10, 5, 7)
+yellow.learn(ranged_attack)
+
 beige = Char("Pope", "alien_beige",
              "Pope is a master spellcaster. He has an essential ability to heal his allies",
              3, 5, 7, 10)
+beige.learn(heal, ranged_attack)
 
 aliens = (green, blue, pink, yellow, beige)
 
@@ -56,9 +67,12 @@ desc_text = "Select your party. You can choose three members"
 
 def draw():
     screen.clear()
+    background.draw()
 
     if MODE == "menu":
-        background.draw()
+        main_menu.render()
+
+    elif MODE == "choice":
         for i, a in enumerate(aliens):
             x = 95 + 100 * i
             y = 100
@@ -72,7 +86,6 @@ def draw():
         draw_buttons()
 
     elif MODE == "inv":
-        background.draw()
         P = padding
         c = (255, 255, 255, 128)
 
@@ -126,8 +139,13 @@ def draw():
     elif MODE == "battle":
         background.draw()
 
+        everyone = party + enemies
+        everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
+        cur_actor = 0  # who makes a turn now
+        active_skill = 1
+
         skills_panel_height = 48 + 2 * padding
-        skills_panel = SkillsPanel(screen, padding, skills_panel_height)
+        skills_panel = SkillsPanel(screen, padding, skills_panel_height, everyone[cur_actor])
         skills_panel.render()
 
         info_panel_height = skills_panel_height - 16
@@ -135,8 +153,6 @@ def draw():
         info_panel.render()
 
         q_panel_width = 150
-        everyone = party + enemies
-        # q_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, party)
         q_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, everyone)
         q_panel.render()
 
@@ -165,8 +181,17 @@ def on_mouse_down(pos):
     global party
     global MODE
     global enemies
+    global main_menu
 
     if MODE == "menu":
+        if main_menu.menu_start.collidepoint(pos):
+            MODE = "choice"
+        if main_menu.menu_load.collidepoint(pos):
+            print("Not implemented yet! Sorry")
+        if main_menu.menu_credits.collidepoint(pos):
+            print(main_menu.game_credits)
+
+    elif MODE == "choice":
         for a in aliens:
             if a.actor.collidepoint(pos):
                 if a.state == "stand":
@@ -210,10 +235,4 @@ def update():
     alien.left += 2
     if alien.left > WIDTH:
         alien.right = 0
-
-def on_mouse_down(pos):
-    global score
-    if alien.collidepoint(pos):
-        set_alien_hurt()
-        score += 1
 """

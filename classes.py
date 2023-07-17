@@ -18,6 +18,7 @@ class Char:
         self.weapon = None
         self.armor = None
         self.slot_no = None
+        self.skills = []
 
     def max_hp(self):
         return self.con * 10 + 50
@@ -39,6 +40,10 @@ class Char:
         self.set_jump()
         clock.schedule_unique(self.set_stand, 0.1)
 
+    def learn(self, *skills):
+        for skill in skills:
+            self.skills.append(skill)
+
     def __repr__(self):
         return f"{self.name}"
 
@@ -59,3 +64,23 @@ class Armor:
         self.image = image
         self.actor = Actor(image)
         self.defence = defence
+
+
+class Skill:
+    def __init__(self, target, name, image, aim, ranged):
+        self.target = target  # friend or foe
+        self.name = name
+        self.image = image
+        self.actor = Actor(image)
+        self.aim = aim  # number of affected slots (single | row | column | area | self)
+        self.ranged = ranged
+
+
+class Attack(Skill):
+    def __init__(self, name, image, aim, ranged):
+        Skill.__init__(self, "foe", name, image, aim, ranged)
+
+
+class Buff(Skill):
+    def __init__(self, name, image, aim):
+        Skill.__init__(self, "friend", name, image, aim, True)  # buffs are always ranged

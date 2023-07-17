@@ -1,4 +1,32 @@
+from pgzero.actor import Actor
 from pygame import Rect
+
+
+class MainMenu:
+    def __init__(self, WIDTH, HEIGHT):
+        self.game_credits = """
+            Created by Anton V. Terekhov using the ingenious
+            Platformer Art Complete Pack by Kenney Vleugels (www.kenney.nl)
+            and the Pygame Zero framework by Daniel Pope.
+        """
+        self.logo = Actor("menu_logo")
+
+        self.menu_start = Actor("menu_start")
+        self.menu_load = Actor("menu_load")
+        self.menu_credits = Actor("menu_credits")
+
+        x = WIDTH / 2
+        self.logo.center = (x, HEIGHT / 3)
+
+        self.menu_start.center = (x, HEIGHT / 2 + 40)
+        self.menu_load.center = (x, HEIGHT / 2 + 80)
+        self.menu_credits.center = (x, HEIGHT / 2 + 120)
+
+    def render(self):
+        self.logo.draw()
+        self.menu_start.draw()
+        self.menu_load.draw()
+        self.menu_credits.draw()
 
 
 class Panel:
@@ -24,25 +52,39 @@ class Panel:
 
 
 class SkillSlot(Panel):
-    def __init__(self, screen, padding, size_x, size_y, x, y, number):
+    def __init__(self, screen, padding, size_x, size_y, x, y, number, hero_skill):
         self.no = number
+        if hero_skill is not None:
+            self.hero_skill = hero_skill
+        else:
+            self.hero_skill = None
         Panel.__init__(self, screen, padding, x, y, size_x, size_y)
+        # print(f"Hi dear I am the skillslot, my dimensions are {size_x}x{size_y}px")
+        if self.hero_skill is not None:
+            self.hero_skill.actor.center = (x + size_x / 2, y + size_y / 2)
+            self.hero_skill.actor.draw()
 
 
 class SkillsPanel(Panel):
-    def __init__(self, screen, padding, height):
+    def __init__(self, screen, padding, height, hero):
         x = padding
         y = screen.height - (padding + height)
         w = screen.width - 2 * padding
         h = height
         Panel.__init__(self, screen, padding, x, y, w, h)
 
+        skill_count = len(hero.skills)
+
         self.skill_slots = []
         for i in range(0, 9):
             size_x = (w - 10 * padding) / 9
             size_y = height - 2 * padding
             x = 2 * padding + i * (padding + size_x)
-            s = SkillSlot(screen, padding, size_x, size_y, x, y + padding, i + 1)
+            if i < skill_count:
+                hero_skill = hero.skills[i]
+            else:
+                hero_skill = None
+            s = SkillSlot(screen, padding, size_x, size_y, x, y + padding, i + 1, hero_skill)
             self.skill_slots.append(s)
 
     def render(self):
@@ -72,7 +114,7 @@ class InfoPanel(Panel):
 class QueuePanel(Panel):
     def __init__(self, screen, padding, width, skills_panel_height, info_panel_height, party):
         # FOR DEBUG ONLY:
-        party = sorted(party, key=lambda x: x.dex, reverse=True)
+        # party = sorted(party, key=lambda x: x.dex, reverse=True)
         # sorting should happen outside this class!
         #################
         x = padding
@@ -120,7 +162,6 @@ class SlotsPanel(Panel):
         h = screen.height - (4 * padding + skills_panel_height + info_panel_height)
         Panel.__init__(self, screen, padding, x, y, w, h)
         self.slots = []
-        # TODO: if mirror...
         slot_width = (w - 3 * padding) / 2
         slot_height = (h - 4 * padding) / 3
         # left column:
