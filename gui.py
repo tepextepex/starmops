@@ -30,10 +30,13 @@ class MainMenu:
 
 
 class Panel:
-    def __init__(self, screen, padding, x, y, w, h):
+    def __init__(self, screen, padding, x, y, w, h, active=False):
         self.screen = screen
         self.padding = padding
-        self.c = (255, 255, 255, 128)
+        if active:
+            self.c = (255, 87, 51)
+        else:
+            self.c = (255, 255, 255, 128)
 
         self.x = x
         self.y = y
@@ -52,13 +55,13 @@ class Panel:
 
 
 class SkillSlot(Panel):
-    def __init__(self, screen, padding, size_x, size_y, x, y, number, hero_skill):
+    def __init__(self, screen, padding, size_x, size_y, x, y, number, hero_skill, active=False):
         self.no = number
         if hero_skill is not None:
             self.hero_skill = hero_skill
         else:
             self.hero_skill = None
-        Panel.__init__(self, screen, padding, x, y, size_x, size_y)
+        Panel.__init__(self, screen, padding, x, y, size_x, size_y, active=active)
         # print(f"Hi dear I am the skillslot, my dimensions are {size_x}x{size_y}px")
         if self.hero_skill is not None:
             self.hero_skill.actor.center = (x + size_x / 2, y + size_y / 2)
@@ -66,7 +69,7 @@ class SkillSlot(Panel):
 
 
 class SkillsPanel(Panel):
-    def __init__(self, screen, padding, height, hero):
+    def __init__(self, screen, padding, height, hero, active_skill_no):
         x = padding
         y = screen.height - (padding + height)
         w = screen.width - 2 * padding
@@ -84,7 +87,11 @@ class SkillsPanel(Panel):
                 hero_skill = hero.skills[i]
             else:
                 hero_skill = None
-            s = SkillSlot(screen, padding, size_x, size_y, x, y + padding, i + 1, hero_skill)
+            if i == active_skill_no - 1:
+                active = True
+            else:
+                active = False
+            s = SkillSlot(screen, padding, size_x, size_y, x, y + padding, i + 1, hero_skill, active=active)
             self.skill_slots.append(s)
 
     def render(self):
@@ -136,25 +143,26 @@ class QueuePanel(Panel):
 
 
 class Slot(Panel):
-    def __init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, slot_no, hero):
+    def __init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, slot_no, hero, active=False):
         self.no = slot_no
         self.hero = hero
         self.slot_x = slot_x
         self.slot_y = slot_y
         self.slot_width = slot_width
         self.slot_height = slot_height
-        Panel.__init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height)
+        Panel.__init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, active=active)
 
     def render(self):
         Panel.render(self)
-        self.screen.draw.text(f"{self.no}", topleft=(self.slot_x, self.slot_y))
+        # self.screen.draw.text(f"{self.no}", topleft=(self.slot_x, self.slot_y))
         if self.hero is not None:
             self.hero.actor.midbottom = (self.slot_x + self.slot_width / 2, self.slot_y + self.slot_height - 1)
             self.hero.actor.draw()
 
 
 class SlotsPanel(Panel):
-    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party, mirror=False):
+    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party,
+                 active_hero, mirror=False):
         # x = 2 * padding + queue_panel_width
         y = padding
         w = screen.width - (4 * padding + queue_panel_width)
@@ -175,7 +183,11 @@ class SlotsPanel(Panel):
             for char in party:
                 if char.slot_no == i:
                     hero = char
-            s = Slot(screen, padding, slot_x, slot_y, slot_width, slot_height, i, hero)
+            if hero is active_hero:
+                active = True
+            else:
+                active = False
+            s = Slot(screen, padding, slot_x, slot_y, slot_width, slot_height, i, hero, active=active)
             self.slots.append(s)
         # right column:
         for i in (4, 5, 6):
@@ -188,7 +200,11 @@ class SlotsPanel(Panel):
             for char in party:
                 if char.slot_no == i:
                     hero = char
-            s = Slot(screen, padding, slot_x, slot_y, slot_width, slot_height, i, hero)
+            if hero is active_hero:
+                active = True
+            else:
+                active = False
+            s = Slot(screen, padding, slot_x, slot_y, slot_width, slot_height, i, hero, active=active)
             self.slots.append(s)
 
     def render(self):
@@ -198,13 +214,14 @@ class SlotsPanel(Panel):
 
 
 class HeroPanel(SlotsPanel):
-    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, party):
+    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, party, active_hero):
         x = 2 * padding + queue_panel_width
         SlotsPanel.__init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party,
-                            mirror=True)
+                            active_hero, mirror=True)
 
 
 class EnemyPanel(SlotsPanel):
-    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, party):
+    def __init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, party, active_hero):
         x = 3 * padding + queue_panel_width + (screen.width - (4 * padding + queue_panel_width)) / 2
-        SlotsPanel.__init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party)
+        SlotsPanel.__init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party,
+                            active_hero)

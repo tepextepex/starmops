@@ -145,7 +145,7 @@ def draw():
         active_skill = 1
 
         skills_panel_height = 48 + 2 * padding
-        skills_panel = SkillsPanel(screen, padding, skills_panel_height, everyone[cur_actor])
+        skills_panel = SkillsPanel(screen, padding, skills_panel_height, everyone[cur_actor], active_skill)
         skills_panel.render()
 
         info_panel_height = skills_panel_height - 16
@@ -157,10 +157,12 @@ def draw():
         q_panel.render()
 
         # hero_panel = SlotsPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width)
-        hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party)
+        hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party,
+                               everyone[cur_actor])
         hero_panel.render()
 
-        enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies)
+        enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies,
+                                 everyone[cur_actor])
         enemy_panel.render()
 
 
