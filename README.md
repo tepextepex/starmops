@@ -1,0 +1,1 @@
+![Main menu screenshot](star_mops_demo_screen.png "STAR MOPS main menu")
