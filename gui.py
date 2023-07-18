@@ -49,8 +49,15 @@ class Panel:
         self.w = w
         self.h = h
 
-        self.box = Rect((self.x, self.y),
-                        (self.w, self.h))
+        self.box = Rect((self.x, self.y), (self.w, self.h))
+
+    def set_active(self):
+        self.c = c_red
+        self.box = Rect((self.x, self.y), (self.w, self.h))
+
+    def set_normal(self):
+        self.c = c_white
+        self.box = Rect((self.x, self.y), (self.w, self.h))
 
     def render(self):
         self.screen.draw.rect(self.box, self.c)
@@ -62,6 +69,10 @@ class Panel:
 
 class SkillSlot(Panel):
     def __init__(self, screen, padding, size_x, size_y, x, y, number, hero_skill, active=False):
+        self.x = x
+        self.y = y
+        self.size_x = size_x
+        self.size_y = size_y
         self.no = number
         if hero_skill is not None:
             self.hero_skill = hero_skill
@@ -69,12 +80,15 @@ class SkillSlot(Panel):
             self.hero_skill = None
         Panel.__init__(self, screen, padding, x, y, size_x, size_y, active=active)
         # print(f"Hi dear I am the skillslot, my dimensions are {size_x}x{size_y}px")
+
+    def render(self):
+        Panel.render(self)
         if self.hero_skill is not None:
-            self.hero_skill.actor.center = (x + size_x / 2, y + size_y / 2)
+            self.hero_skill.actor.center = (self.x + self.size_x / 2, self.y + self.size_y / 2)
             self.hero_skill.actor.draw()
 
 
-class SkillsPanel(Panel):
+class SkillPanel(Panel):
     def __init__(self, screen, padding, height, hero, active_skill_no):
         x = padding
         y = screen.height - (padding + height)
@@ -99,6 +113,11 @@ class SkillsPanel(Panel):
                 active = False
             s = SkillSlot(screen, padding, size_x, size_y, x, y + padding, i + 1, hero_skill, active=active)
             self.skill_slots.append(s)
+
+    def set_active_skill(self, no):
+        for s in self.skill_slots:
+            s.set_normal()
+        self.skill_slots[no - 1].set_active()
 
     def render(self):
         Panel.render(self)
@@ -126,26 +145,27 @@ class InfoPanel(Panel):
 
 class QueuePanel(Panel):
     def __init__(self, screen, padding, width, skills_panel_height, info_panel_height, party):
-        # FOR DEBUG ONLY:
-        # party = sorted(party, key=lambda x: x.dex, reverse=True)
-        # sorting should happen outside this class!
-        #################
         x = padding
         y = padding
         w = width
         h = screen.height - (4 * padding + skills_panel_height + info_panel_height)
+        self.party = party
         # print(f"Hi dear I am the Queue Panel, my height is {h} px")
         Panel.__init__(self, screen, padding, x, y, w, h)
-        badge_size = 32
-        padding = 3  # MAGIC NUMBER
-        for i, hero in enumerate(party):
-            hero_x = self.x + padding
-            hero_y = self.y + padding + i * (padding + badge_size)
+        self.badge_size = 32
+        self.padding = 3  # MAGIC NUMBER
+
+    def render(self):
+        Panel.render(self)
+        for i, hero in enumerate(self.party):
+            hero_x = self.x + self.padding
+            hero_y = self.y + self.padding + i * (self.padding + self.badge_size)
             # print(hero_x, hero_y)
             hero.badge.topleft = (hero_x, hero_y)
             hero.badge.draw()
             self.screen.draw.text(f"Q {hero.dex * 10}",
-                                  midleft=(hero_x + badge_size * 1.5 + padding, hero_y + badge_size / 2))
+                                  midleft=(hero_x + self.badge_size * 1.5 + self.padding,
+                                           hero_y + self.badge_size / 2))
 
 
 class Slot(Panel):
@@ -237,7 +257,7 @@ class BattleScreen:
     def __init__(self, screen, padding, skills_panel_height, info_panel_height, q_panel_width,
                  party, enemies, everyone, active_skill, active_char):
         self.screen = screen
-        self.skills_panel = SkillsPanel(screen, padding, skills_panel_height, active_char, active_skill)
+        self.skill_panel = SkillPanel(screen, padding, skills_panel_height, active_char, active_skill)
         self.info_panel = InfoPanel(screen, padding, info_panel_height, skills_panel_height)
         self.queue_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, everyone)
         self.hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party,
@@ -246,7 +266,7 @@ class BattleScreen:
                                  active_char)
 
     def render(self):
-        self.skills_panel.render()
+        self.skill_panel.render()
         self.info_panel.render()
         self.queue_panel.render()
         self.hero_panel.render()

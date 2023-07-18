@@ -10,6 +10,7 @@ from config import *
 
 MODE = "menu"
 main_menu = MainMenu(WIDTH, HEIGHT)
+battle_screen = None
 
 background = Actor("purple_space")
 
@@ -141,12 +142,6 @@ def draw():
     elif MODE == "battle":
         background.draw()
 
-        everyone = party + enemies
-        everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
-        cur_actor = 0  # who makes a turn now
-
-        battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
-                                     party, enemies, everyone, active_skill, everyone[cur_actor])
         battle_screen.render()
 
 
@@ -167,7 +162,7 @@ def on_mouse_down(pos):
     global party
     global MODE
     global enemies
-    global main_menu
+    global main_menu, battle_screen
     global active_skill
 
     if MODE == "menu":
@@ -218,6 +213,13 @@ def on_mouse_down(pos):
             MODE = "battle"
             active_skill = 1
 
+            everyone = party + enemies
+            everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
+            cur_actor = 0  # who makes a turn now
+
+            battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
+                                         party, enemies, everyone, active_skill, everyone[cur_actor])
+
 """
 def on_mouse_move(pos):
     global hero_panel, enemy_panel
@@ -233,27 +235,17 @@ def on_mouse_move(pos):
                 print(s)
 """
 
+
 def on_key_up(key):
     global active_skill
+    global battle_screen
     if MODE == "battle":
-        if key == keys.K_1:
-            active_skill = 1
-        if key == keys.K_2:
-            active_skill = 2
-        if key == keys.K_3:
-            active_skill = 3
-        if key == keys.K_4:
-            active_skill = 4
-        if key == keys.K_5:
-            active_skill = 5
-        if key == keys.K_6:
-            active_skill = 6
-        if key == keys.K_7:
-            active_skill = 7
-        if key == keys.K_8:
-            active_skill = 8
-        if key == keys.K_9:
-            active_skill = 9
+        num_keys = [f"K_{x}" for x in range(1, 10)]
+        if key.name in num_keys:
+            key_no = int(key.name.split("_")[1])
+            active_skill = key_no
+            battle_screen.skill_panel.set_active_skill(key_no)
+
 """
 def update():
     alien.left += 2
