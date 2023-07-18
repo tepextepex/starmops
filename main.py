@@ -6,10 +6,7 @@ from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
 from gui import MainMenu, BattleScreen
-
-WIDTH = 640
-HEIGHT = 480
-padding = 10
+from config import *
 
 MODE = "menu"
 main_menu = MainMenu(WIDTH, HEIGHT)
@@ -17,13 +14,13 @@ main_menu = MainMenu(WIDTH, HEIGHT)
 background = Actor("purple_space")
 
 quit_btn = Actor("arrow_red")
-quit_btn.bottomleft = 0 + padding, HEIGHT
+quit_btn.bottomleft = 0 + PADDING, HEIGHT
 
 next_btn = Actor("arrow_green")
-next_btn.bottomright = WIDTH - padding, HEIGHT
+next_btn.bottomright = WIDTH - PADDING, HEIGHT
 
 battle_btn = Actor("arrow_green")
-battle_btn.bottomright = WIDTH - padding, HEIGHT
+battle_btn.bottomright = WIDTH - PADDING, HEIGHT
 
 green = Char("Hodor", "alien_green",
              "Hodor is the tank. THE tank. He is a tough guy who defends his dudes",
@@ -66,8 +63,6 @@ active_skill = 1
 
 desc_text = "Select your party. You can choose three members"
 
-hero_panel, enemy_panel = None, None
-
 
 def draw():
     global active_skill
@@ -93,7 +88,7 @@ def draw():
         draw_buttons()
 
     elif MODE == "inv":
-        P = padding
+        P = PADDING
         c = (255, 255, 255, 128)
 
         # hero panels:
@@ -150,10 +145,7 @@ def draw():
         everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
         cur_actor = 0  # who makes a turn now
 
-        skills_panel_height = 48 + 2 * padding
-        info_panel_height = skills_panel_height - 16
-        q_panel_width = 150
-        battle_screen = BattleScreen(screen, padding, skills_panel_height, info_panel_height, q_panel_width,
+        battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
                                      party, enemies, everyone, active_skill, everyone[cur_actor])
         battle_screen.render()
 

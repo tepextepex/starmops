@@ -134,14 +134,14 @@ class QueuePanel(Panel):
         y = padding
         w = width
         h = screen.height - (4 * padding + skills_panel_height + info_panel_height)
-        print(f"Hi dear I am the Queue Panel, my height is {h} px")
+        # print(f"Hi dear I am the Queue Panel, my height is {h} px")
         Panel.__init__(self, screen, padding, x, y, w, h)
         badge_size = 32
         padding = 3  # MAGIC NUMBER
         for i, hero in enumerate(party):
             hero_x = self.x + padding
             hero_y = self.y + padding + i * (padding + badge_size)
-            print(hero_x, hero_y)
+            # print(hero_x, hero_y)
             hero.badge.topleft = (hero_x, hero_y)
             hero.badge.draw()
             self.screen.draw.text(f"Q {hero.dex * 10}",
