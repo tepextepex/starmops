@@ -62,10 +62,14 @@ dummy_umbrella = Armor("dummy", "Umbrella", "umbrella_open", 2)
 
 inv = [dummy_gun, dummy_sword, dummy_shield, dummy_umbrella]
 
+active_skill = 1
+
 desc_text = "Select your party. You can choose three members"
 
 
 def draw():
+    global active_skill
+
     screen.clear()
     background.draw()
 
@@ -142,7 +146,6 @@ def draw():
         everyone = party + enemies
         everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
         cur_actor = 0  # who makes a turn now
-        active_skill = 1
 
         skills_panel_height = 48 + 2 * padding
         skills_panel = SkillsPanel(screen, padding, skills_panel_height, everyone[cur_actor], active_skill)
@@ -184,6 +187,7 @@ def on_mouse_down(pos):
     global MODE
     global enemies
     global main_menu
+    global active_skill
 
     if MODE == "menu":
         if main_menu.menu_start.collidepoint(pos):
@@ -231,7 +235,30 @@ def on_mouse_down(pos):
             for e, i in zip(enemies, (1, 2, 3, 5)):
                 e.slot_no = i
             MODE = "battle"
+            active_skill = 1
 
+
+def on_key_up(key):
+    global active_skill
+    if MODE == "battle":
+        if key == keys.K_1:
+            active_skill = 1
+        if key == keys.K_2:
+            active_skill = 2
+        if key == keys.K_3:
+            active_skill = 3
+        if key == keys.K_4:
+            active_skill = 4
+        if key == keys.K_5:
+            active_skill = 5
+        if key == keys.K_6:
+            active_skill = 6
+        if key == keys.K_7:
+            active_skill = 7
+        if key == keys.K_8:
+            active_skill = 8
+        if key == keys.K_9:
+            active_skill = 9
 """
 def update():
     alien.left += 2
