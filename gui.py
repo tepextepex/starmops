@@ -1,6 +1,9 @@
 from pgzero.actor import Actor
 from pygame import Rect
 
+c_white = (255, 255, 255, 128)
+c_red = (255, 87, 51)
+c_green = (76, 187, 23)
 
 class MainMenu:
     def __init__(self, WIDTH, HEIGHT):
@@ -30,13 +33,16 @@ class MainMenu:
 
 
 class Panel:
-    def __init__(self, screen, padding, x, y, w, h, active=False):
+    def __init__(self, screen, padding, x, y, w, h, active=False, target=False):
         self.screen = screen
         self.padding = padding
+        self.target = target
         if active:
-            self.c = (255, 87, 51)
+            self.c = c_red
         else:
-            self.c = (255, 255, 255, 128)
+            self.c = c_white
+        if self.target:
+            self.c = c_green
 
         self.x = x
         self.y = y
@@ -225,3 +231,23 @@ class EnemyPanel(SlotsPanel):
         x = 3 * padding + queue_panel_width + (screen.width - (4 * padding + queue_panel_width)) / 2
         SlotsPanel.__init__(self, screen, padding, skills_panel_height, info_panel_height, queue_panel_width, x, party,
                             active_hero)
+
+
+class BattleScreen:
+    def __init__(self, screen, padding, skills_panel_height, info_panel_height, q_panel_width,
+                 party, enemies, everyone, active_skill, active_char):
+        self.screen = screen
+        self.skills_panel = SkillsPanel(screen, padding, skills_panel_height, active_char, active_skill)
+        self.info_panel = InfoPanel(screen, padding, info_panel_height, skills_panel_height)
+        self.queue_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, everyone)
+        self.hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party,
+                               active_char)
+        self.enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies,
+                                 active_char)
+
+    def render(self):
+        self.skills_panel.render()
+        self.info_panel.render()
+        self.queue_panel.render()
+        self.hero_panel.render()
+        self.enemy_panel.render()

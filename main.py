@@ -5,7 +5,7 @@ from hero_skills import *
 from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
-from gui import MainMenu, SkillsPanel, InfoPanel, QueuePanel, SlotsPanel, HeroPanel, EnemyPanel
+from gui import MainMenu, BattleScreen
 
 WIDTH = 640
 HEIGHT = 480
@@ -66,9 +66,12 @@ active_skill = 1
 
 desc_text = "Select your party. You can choose three members"
 
+hero_panel, enemy_panel = None, None
+
 
 def draw():
     global active_skill
+    global hero_panel, enemy_panel
 
     screen.clear()
     background.draw()
@@ -148,25 +151,11 @@ def draw():
         cur_actor = 0  # who makes a turn now
 
         skills_panel_height = 48 + 2 * padding
-        skills_panel = SkillsPanel(screen, padding, skills_panel_height, everyone[cur_actor], active_skill)
-        skills_panel.render()
-
         info_panel_height = skills_panel_height - 16
-        info_panel = InfoPanel(screen, padding, info_panel_height, skills_panel_height)
-        info_panel.render()
-
         q_panel_width = 150
-        q_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, everyone)
-        q_panel.render()
-
-        # hero_panel = SlotsPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width)
-        hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party,
-                               everyone[cur_actor])
-        hero_panel.render()
-
-        enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies,
-                                 everyone[cur_actor])
-        enemy_panel.render()
+        battle_screen = BattleScreen(screen, padding, skills_panel_height, info_panel_height, q_panel_width,
+                                     party, enemies, everyone, active_skill, everyone[cur_actor])
+        battle_screen.render()
 
 
 def draw_description():
@@ -237,6 +226,20 @@ def on_mouse_down(pos):
             MODE = "battle"
             active_skill = 1
 
+"""
+def on_mouse_move(pos):
+    global hero_panel, enemy_panel
+    if MODE == "battle":
+        # TODO: check whose turn is this (heros or enemies)
+        for s in hero_panel.slots:
+            if s.box.collidepoint(pos):
+                s.target = True
+                print(s)
+        for s in enemy_panel.slots:
+            if s.box.collidepoint(pos):
+                s.target = True
+                print(s)
+"""
 
 def on_key_up(key):
     global active_skill
