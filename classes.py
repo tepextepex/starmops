@@ -19,6 +19,8 @@ class Char:
         self.armor = None
         self.slot_no = None
         self.skills = []
+        self.hp = self.max_hp()
+        self.mp = self.max_mp()
 
     def max_hp(self):
         return self.con * 10 + 50
