@@ -26,7 +26,7 @@ class Char:
         return self.con * 10 + 50
 
     def max_mp(self):
-        return self.int + 10
+        return self.int * 10
 
     def set_jump(self):
         self.state = "jump"
