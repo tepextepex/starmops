@@ -4,6 +4,8 @@ from pygame import Rect
 c_white = (255, 255, 255, 128)
 c_red = (255, 87, 51)
 c_green = (76, 187, 23)
+c_blue = (117, 194, 246)
+
 
 class MainMenu:
     def __init__(self, WIDTH, HEIGHT):
@@ -33,16 +35,15 @@ class MainMenu:
 
 
 class Panel:
-    def __init__(self, screen, padding, x, y, w, h, active=False, target=False):
+    def __init__(self, screen, padding, x, y, w, h, active=False):
         self.screen = screen
         self.padding = padding
-        self.target = target
         if active:
-            self.c = c_red
+            self.c = c_green
+            self.active = True
         else:
             self.c = c_white
-        if self.target:
-            self.c = c_green
+            self.active = False
 
         self.x = x
         self.y = y
@@ -52,14 +53,26 @@ class Panel:
         self.box = Rect((self.x, self.y), (self.w, self.h))
 
     def set_active(self):
-        self.c = c_red
-        self.box = Rect((self.x, self.y), (self.w, self.h))
+        self.active = True
+        self.c = c_green
+        # self.box = Rect((self.x, self.y), (self.w, self.h))
 
     def set_normal(self):
+        self.active = False
         self.c = c_white
-        self.box = Rect((self.x, self.y), (self.w, self.h))
+        # self.box = Rect((self.x, self.y), (self.w, self.h))
+
+    def set_target(self):
+        self.c = c_red
+
+    def set_untarget(self):
+        if self.active:
+            self.c = c_green
+        else:
+            self.c = c_white
 
     def render(self):
+        self.box = Rect((self.x, self.y), (self.w, self.h))
         self.screen.draw.rect(self.box, self.c)
 
 ########################################
@@ -168,6 +181,35 @@ class QueuePanel(Panel):
                                            hero_y + self.badge_size / 2))
 
 
+class VertBar:
+    def __init__(self, screen, left, top, height, width, value, max_value, color):
+        self.screen = screen
+        self.left = left
+        self.top = top
+        self.width = width
+        self.height = height
+        self.color = color
+        self.value = value
+        self.max_value = max_value
+        self.cur_height = round(value / self.max_value * self.height)
+        if (self.cur_height == 0) and (self.value > 0):
+            self.cur_height = 1  # should be at least 1px if hp/mp is not zero
+        # print(f"cur height is {self.cur_height} out of {self.height}")
+        self.cur_top = self.top + self.height - self.cur_height
+        self.box = Rect((self.left, self.cur_top), (self.width, self.cur_height))
+
+    def update(self, value):
+        self.value = value
+        self.cur_height = round(value / self.max_value * self.height)
+        if (self.cur_height == 0) and (self.value > 0):
+            self.cur_height = 1  # should be at least 1px if hp/mp is not zero
+        self.cur_top = self.top + self.height - self.cur_height
+        self.box = Rect((self.left, self.cur_top), (self.width, self.cur_height))
+
+    def render(self):
+        self.screen.draw.filled_rect(self.box, self.color)
+
+
 class Slot(Panel):
     def __init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, slot_no, hero, active=False):
         self.no = slot_no
@@ -176,6 +218,15 @@ class Slot(Panel):
         self.slot_y = slot_y
         self.slot_width = slot_width
         self.slot_height = slot_height
+        self.hp_bar = None
+        self.mp_bar = None
+        if self.hero is not None:
+            bar_w = 9
+            bar_h = slot_height - 6
+            self.hp_bar = VertBar(screen, slot_x + 3, slot_y + 3, bar_h, bar_w,
+                                  hero.hp, hero.max_hp(), c_red)
+            self.mp_bar = VertBar(screen, slot_x + slot_width - bar_w - 3, slot_y + 3, bar_h, bar_w,
+                                  hero.mp, hero.max_mp(), c_blue)
         Panel.__init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, active=active)
 
     def render(self):
@@ -184,6 +235,9 @@ class Slot(Panel):
         if self.hero is not None:
             self.hero.actor.midbottom = (self.slot_x + self.slot_width / 2, self.slot_y + self.slot_height - 1)
             self.hero.actor.draw()
+            # TODO: update HP and MP bars!
+            self.hp_bar.render()
+            self.mp_bar.render()
 
 
 class SlotsPanel(Panel):

@@ -52,6 +52,7 @@ aliens = (green, blue, pink, yellow, beige)
 
 party = []
 enemies = []
+everyone = party + enemies
 
 dummy_gun = Weapon("ranged", "Ray gun", "raygun", 10)
 dummy_sword = Weapon("melee", "Rusty sword", "sword_bronze", 15)
@@ -61,13 +62,14 @@ dummy_umbrella = Armor("dummy", "Umbrella", "umbrella_open", 2)
 inv = [dummy_gun, dummy_sword, dummy_shield, dummy_umbrella]
 
 active_skill = 1
+cur_actor = None
 
 desc_text = "Select your party. You can choose three members"
 
 
 def draw():
     global active_skill
-    global hero_panel, enemy_panel
+    # global hero_panel, enemy_panel
 
     screen.clear()
     background.draw()
@@ -159,11 +161,10 @@ def draw_buttons():
 
 def on_mouse_down(pos):
     global desc_text
-    global party
+    global party, enemies, everyone
     global MODE
-    global enemies
     global main_menu, battle_screen
-    global active_skill
+    global active_skill, cur_actor
 
     if MODE == "menu":
         if main_menu.menu_start.collidepoint(pos):
@@ -220,20 +221,50 @@ def on_mouse_down(pos):
             battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
                                          party, enemies, everyone, active_skill, everyone[cur_actor])
 
-"""
+
 def on_mouse_move(pos):
-    global hero_panel, enemy_panel
+    global active_skill, cur_actor
+    global battle_screen
+    global everyone
     if MODE == "battle":
-        # TODO: check whose turn is this (heros or enemies)
-        for s in hero_panel.slots:
-            if s.box.collidepoint(pos):
-                s.target = True
-                print(s)
-        for s in enemy_panel.slots:
-            if s.box.collidepoint(pos):
-                s.target = True
-                print(s)
-"""
+        # TODO: check whose turn is this (heroes or enemies)
+        # TODO: check what skill is active now (melee|ranged & aim-mode)
+        aim = everyone[cur_actor].skills[active_skill - 1].aim
+        target = everyone[cur_actor].skills[active_skill - 1].target
+        if target == "friend":
+            for s in battle_screen.hero_panel.slots:
+                if s.box.collidepoint(pos):
+                    if aim == "single":
+                        s.set_target()
+                else:
+                    s.set_untarget()
+
+        if target == "foe":
+            for s in battle_screen.enemy_panel.slots:
+                if s.box.collidepoint(pos):
+                    if aim == "single":
+                        s.set_target()
+                    elif aim == "row":
+                        if s.no in (1, 2, 3):
+                            battle_screen.enemy_panel.slots[0].set_target()
+                            battle_screen.enemy_panel.slots[1].set_target()
+                            battle_screen.enemy_panel.slots[2].set_target()
+                        elif s.no in (4, 5, 6):
+                            battle_screen.enemy_panel.slots[3].set_target()
+                            battle_screen.enemy_panel.slots[4].set_target()
+                            battle_screen.enemy_panel.slots[5].set_target()
+                    elif aim == "column":
+                        if s.no in (1, 4):
+                            battle_screen.enemy_panel.slots[0].set_target()
+                            battle_screen.enemy_panel.slots[3].set_target()
+                        elif s.no in (2, 5):
+                            battle_screen.enemy_panel.slots[1].set_target()
+                            battle_screen.enemy_panel.slots[4].set_target()
+                        elif s.no in (3, 6):
+                            battle_screen.enemy_panel.slots[2].set_target()
+                            battle_screen.enemy_panel.slots[5].set_target()
+                else:
+                    s.set_untarget()
 
 
 def on_key_up(key):
@@ -242,6 +273,7 @@ def on_key_up(key):
     if MODE == "battle":
         num_keys = [f"K_{x}" for x in range(1, 10)]
         if key.name in num_keys:
+            # TODO: проверять, есть ли вообще такой скилл у текущего игрока
             key_no = int(key.name.split("_")[1])
             active_skill = key_no
             battle_screen.skill_panel.set_active_skill(key_no)
