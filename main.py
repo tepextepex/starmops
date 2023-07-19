@@ -5,7 +5,8 @@ from hero_skills import *
 from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
-from gui import MainMenu, BattleScreen
+from gui import MainMenu, BattleScreen, HorBar
+from gui import c_red, c_blue
 from config import *
 
 MODE = "menu"
@@ -95,6 +96,7 @@ def draw():
         c = (255, 255, 255, 128)
 
         # hero panels:
+        bars = []
         for i, hero in enumerate(party):
             # print(i, hero)
             w = (WIDTH - P * 4) / 3
@@ -115,6 +117,9 @@ def draw():
 
             # drawing hero stats:
             y = 2 * P + h / 2
+            # HP and MP bars:
+            bars.append(HorBar(screen, x + 10, y + 4, 12, w - 20, hero.hp, hero.max_hp(), c_red))
+            bars.append(HorBar(screen, x + 10, y + 20, 12, w - 20, hero.mp, hero.max_mp(), c_blue))
             # column 1
             #screen.draw.text(f"MAX HP {hero.max_hp()}", midtop=(x + w / 4, y + P))
             screen.draw.text(f"STR {hero.str}", midtop=(x + w / 4, y + 4 * P))
@@ -124,6 +129,8 @@ def draw():
             screen.draw.text(f"CON {hero.con}", midtop=(x + 3 * w / 4, y + 4 * P))
             screen.draw.text(f"INT {hero.int}", midtop=(x + 3 * w / 4, y + 7 * P))
 
+        for bar in bars:
+            bar.render()
         # inventory panel:
         x = P
         y = P + HEIGHT / 2

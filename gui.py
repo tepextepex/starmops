@@ -181,6 +181,31 @@ class QueuePanel(Panel):
                                            hero_y + self.badge_size / 2))
 
 
+class HorBar:
+    def __init__(self, screen, left, top, height, width, value, max_value, color):
+        self.screen = screen
+        self.left = left
+        self.top = top
+        self.width = width
+        self.height = height
+        self.color = color
+        self.value = value
+        self.max_value = max_value
+
+        self.cur_width = round(value / self.max_value * self.width)
+        if (self.cur_width == 0) and (self.value > 0):
+            self.cur_width = 1  # should be at least 1px if hp/mp is not zero
+        self.cur_left = left
+        self.box = Rect((self.cur_left, self.top), (self.cur_width, self.height))
+
+    def render(self):
+        self.screen.draw.filled_rect(self.box, self.color)
+        self.screen.draw.text(f"{self.value}/{self.max_value}",
+                              midtop=(self.left + self.width / 2, self.top),
+                              width=self.width,
+                              fontsize=18)
+
+
 class VertBar:
     def __init__(self, screen, left, top, height, width, value, max_value, color):
         self.screen = screen
@@ -191,6 +216,7 @@ class VertBar:
         self.color = color
         self.value = value
         self.max_value = max_value
+
         self.cur_height = round(value / self.max_value * self.height)
         if (self.cur_height == 0) and (self.value > 0):
             self.cur_height = 1  # should be at least 1px if hp/mp is not zero
