@@ -68,6 +68,17 @@ cur_actor = None
 desc_text = "Select your party. You can choose three members"
 
 
+def make_turn():
+    global cur_actor, everyone
+    global battle_screen
+    if cur_actor < (len(everyone) - 1):
+        cur_actor += 1
+    else:
+        cur_actor = 0
+    print(everyone[cur_actor])
+    battle_screen.highlight(everyone[cur_actor])
+
+
 def draw():
     global active_skill
     # global hero_panel, enemy_panel
@@ -227,6 +238,9 @@ def on_mouse_down(pos):
 
             battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
                                          party, enemies, everyone, active_skill, everyone[cur_actor])
+
+    elif MODE == "battle":
+        make_turn()
 
 
 def on_mouse_move(pos):

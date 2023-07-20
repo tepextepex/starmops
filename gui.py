@@ -345,6 +345,18 @@ class BattleScreen:
         self.enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies,
                                  active_char)
 
+    def highlight(self, char):
+        for slot in self.hero_panel.slots:
+            if slot.hero is char:
+                slot.set_active()
+            else:
+                slot.set_normal()
+        for slot in self.enemy_panel.slots:
+            if slot.hero is char:
+                slot.set_active()
+            else:
+                slot.set_normal()
+
     def render(self):
         self.skill_panel.render()
         self.info_panel.render()
