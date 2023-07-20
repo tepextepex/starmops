@@ -5,8 +5,9 @@ from hero_skills import *
 from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
-from gui import MainMenu, BattleScreen, HorBar
-from gui import c_red, c_blue
+from gui.main_menu import MainMenu
+from gui.battle_screen import BattleScreen, HorBar
+from gui.battle_screen import c_red, c_blue
 from config import *
 
 MODE = "menu"
@@ -68,15 +69,26 @@ cur_actor = None
 desc_text = "Select your party. You can choose three members"
 
 
-def make_turn():
+def make_turn(author, target, skill):
     global cur_actor, everyone
     global battle_screen
+    global enemies  # DEBUG
+
+    author.mp -= 10
+    target.hp -= 30
+
     if cur_actor < (len(everyone) - 1):
         cur_actor += 1
     else:
         cur_actor = 0
-    print(everyone[cur_actor])
+
     battle_screen.highlight(everyone[cur_actor])
+    battle_screen.update_skill_panel(everyone[cur_actor])
+
+    # print(f"{author} targets {target} using {skill}")
+    # print(f"Current actor: {everyone[cur_actor]}")
+    message = f"{author} targets {target} using {skill}. Now it's {everyone[cur_actor]}'s turn"
+    battle_screen.info_panel.print(message)
 
 
 def draw():
@@ -240,7 +252,32 @@ def on_mouse_down(pos):
                                          party, enemies, everyone, active_skill, everyone[cur_actor])
 
     elif MODE == "battle":
-        make_turn()
+        if everyone[cur_actor] in party:
+            target_actor = None
+            if everyone[cur_actor].skills[active_skill - 1].target == "foe":
+                # then we should target the enemies only
+                for slot in battle_screen.enemy_panel.slots:
+                    if slot.box.collidepoint(pos):
+                        print(f"The enemy is on target: {slot.hero}")
+                        target_actor = slot.hero
+                # TODO: check what skill is active now (melee|ranged & aim-mode)
+            elif everyone[cur_actor].skills[active_skill - 1].target == "friend":
+                # then we are able to target only our friends
+                for slot in battle_screen.hero_panel.slots:
+                    if slot.box.collidepoint(pos):
+                        print(f"The friend is on target: {slot.hero}")
+                        target_actor = slot.hero
+                # TODO: check what skill is active now (melee|ranged & aim-mode)
+            if target_actor is not None:
+                make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+
+        elif everyone[cur_actor] in enemies:
+            # TODO: to be replaced with the automated enemy attacks
+            for slot in battle_screen.hero_panel.slots:
+                if slot.box.collidepoint(pos):
+                    print(f"The friend is on target: {slot.hero}")
+                    target_actor = slot.hero
+            make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
 
 
 def on_mouse_move(pos):

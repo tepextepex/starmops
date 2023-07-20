@@ -67,6 +67,9 @@ class SkillSlot(Panel):
         Panel.__init__(self, screen, padding, x, y, size_x, size_y, active=active)
         # print(f"Hi dear I am the skillslot, my dimensions are {size_x}x{size_y}px")
 
+    def update(self, hero_skill):
+        self.hero_skill = hero_skill
+
     def render(self):
         Panel.render(self)
         if self.hero_skill is not None:
@@ -105,6 +108,15 @@ class SkillPanel(Panel):
             s.set_normal()
         self.skill_slots[no - 1].set_active()
 
+    def update_all(self, hero):
+        skill_count = len(hero.skills)
+        for i in range(0, 9):
+            if i < skill_count:
+                hero_skill = hero.skills[i]
+            else:
+                hero_skill = None
+            self.skill_slots[i].update(hero_skill)
+
     def render(self):
         Panel.render(self)
         for s in self.skill_slots:
@@ -120,6 +132,9 @@ class InfoPanel(Panel):
         h = height
         self.message = "This info panel will tell you about all the actions made by friends and foes during the battle"
         Panel.__init__(self, screen, padding, x, y, w, h)
+
+    def print(self, message):
+        self.message = message
 
     def render(self):
         Panel.render(self)
@@ -234,7 +249,10 @@ class Slot(Panel):
         if self.hero is not None:
             self.hero.actor.midbottom = (self.slot_x + self.slot_width / 2, self.slot_y + self.slot_height - 1)
             self.hero.actor.draw()
-            # TODO: update HP and MP bars!
+
+            self.hp_bar.update(self.hero.hp)
+            self.mp_bar.update(self.hero.mp)
+
             self.hp_bar.render()
             self.mp_bar.render()
 
@@ -329,6 +347,9 @@ class BattleScreen:
                 slot.set_active()
             else:
                 slot.set_normal()
+
+    def update_skill_panel(self, char):
+        self.skill_panel.update_all(char)
 
     def render(self):
         self.skill_panel.render()
