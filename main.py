@@ -38,12 +38,12 @@ blue.learn(melee_attack, ranged_attack)
 pink = Char("Scarface", "alien_pink",
             "Scarface is always smiling, but don't fall for this. He is fierce and adores to dismember his opponents",
             10, 5, 7, 3)
-pink.learn(melee_attack)
+pink.learn(melee_attack, rage)
 
 yellow = Char("Eastwood", "alien_yellow",
               "A gunslinger without a name. Everybody calls him Eastwood but we have no idea why",
               3, 10, 5, 7)
-yellow.learn(ranged_attack)
+yellow.learn(ranged_attack, piercing_shot)
 
 beige = Char("Pope", "alien_beige",
              "Pope is a master spellcaster. He has an essential ability to heal his allies",
@@ -74,23 +74,26 @@ def make_turn(author, target, skill):
     global battle_screen
     global enemies  # DEBUG
 
-    author.mp -= 10
-    target.hp -= 30
+    if author.mp >= skill.mp_cost:
+        author.mp -= skill.mp_cost
+        target.hp -= 30
+    
+        active_skill = 1
+        battle_screen.skill_panel.set_active_skill(1)
 
-    active_skill = 1
-    battle_screen.skill_panel.set_active_skill(1)
+        if cur_actor < (len(everyone) - 1):
+            cur_actor += 1
+        else:
+            cur_actor = 0
 
-    if cur_actor < (len(everyone) - 1):
-        cur_actor += 1
+        battle_screen.highlight(everyone[cur_actor])
+        battle_screen.update_skill_panel(everyone[cur_actor])
+
+        # print(f"{author} targets {target} using {skill}")
+        # print(f"Current actor: {everyone[cur_actor]}")
+        message = f"{author} targets {target} using {skill}. Now it's {everyone[cur_actor]}'s turn"
     else:
-        cur_actor = 0
-
-    battle_screen.highlight(everyone[cur_actor])
-    battle_screen.update_skill_panel(everyone[cur_actor])
-
-    # print(f"{author} targets {target} using {skill}")
-    # print(f"Current actor: {everyone[cur_actor]}")
-    message = f"{author} targets {target} using {skill}. Now it's {everyone[cur_actor]}'s turn"
+        message = f"Not enough MP!"
     battle_screen.info_panel.print(message)
 
 
