@@ -70,12 +70,15 @@ desc_text = "Select your party. You can choose three members"
 
 
 def make_turn(author, target, skill):
-    global cur_actor, everyone
+    global cur_actor, active_skill, everyone
     global battle_screen
     global enemies  # DEBUG
 
     author.mp -= 10
     target.hp -= 30
+
+    active_skill = 1
+    battle_screen.skill_panel.set_active_skill(1)
 
     if cur_actor < (len(everyone) - 1):
         cur_actor += 1
@@ -328,17 +331,12 @@ def on_mouse_move(pos):
 def on_key_up(key):
     global active_skill
     global battle_screen
+    global everyone, cur_actor
     if MODE == "battle":
         num_keys = [f"K_{x}" for x in range(1, 10)]
         if key.name in num_keys:
             # TODO: проверять, есть ли вообще такой скилл у текущего игрока
             key_no = int(key.name.split("_")[1])
-            active_skill = key_no
-            battle_screen.skill_panel.set_active_skill(key_no)
-
-"""
-def update():
-    alien.left += 2
-    if alien.left > WIDTH:
-        alien.right = 0
-"""
+            if key_no <= len(everyone[cur_actor].skills):
+                active_skill = key_no
+                battle_screen.skill_panel.set_active_skill(key_no)
