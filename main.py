@@ -77,7 +77,7 @@ def make_turn(author, target, skill):
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
         target.hp -= 30
-    
+
         active_skill = 1
         battle_screen.skill_panel.set_active_skill(1)
 
@@ -279,10 +279,7 @@ def on_mouse_down(pos):
 
         elif everyone[cur_actor] in enemies:
             # TODO: to be replaced with the automated enemy attacks
-            for slot in battle_screen.hero_panel.slots:
-                if slot.box.collidepoint(pos):
-                    print(f"The friend is on target: {slot.hero}")
-                    target_actor = slot.hero
+            target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
             make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
 
 
@@ -296,10 +293,14 @@ def on_mouse_move(pos):
         aim = everyone[cur_actor].skills[active_skill - 1].aim
         target = everyone[cur_actor].skills[active_skill - 1].target
         if target == "friend":
+            # TODO: untarget all the foe slots
             for s in battle_screen.hero_panel.slots:
                 if s.box.collidepoint(pos):
                     if aim == "single":
                         s.set_target()
+                    elif aim == "self":
+                        if s.hero == everyone[cur_actor]:
+                            s.set_target()
                 else:
                     s.set_untarget()
 
