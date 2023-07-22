@@ -76,7 +76,7 @@ def make_turn(author, target, skill):
 
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
-        # target.hp -= 30
+        # TODO: compute "value" based on hero stats and current weapon
         skill.affect_target(target, 30)
 
         active_skill = 1
@@ -281,6 +281,10 @@ def on_mouse_down(pos):
         elif everyone[cur_actor] in enemies:
             # TODO: to be replaced with the automated enemy attacks
             target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
+            # however, if some of the heroes activated the only_target skill, then AI chooses him:
+            for hero in party:
+                if hero.only_target:
+                    target_actor = hero
             make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
 
 
