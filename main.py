@@ -76,7 +76,8 @@ def make_turn(author, target, skill):
 
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
-        target.hp -= 30
+        # target.hp -= 30
+        skill.affect_target(target, 30)
 
         active_skill = 1
         battle_screen.skill_panel.set_active_skill(1)
