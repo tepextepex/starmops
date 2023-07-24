@@ -1,6 +1,8 @@
 from pgzero.actor import Actor
 # from pgzero.game import screen  # game won't start with this import line
 from pygame import Rect
+
+from gui.selection_screen import SelectionScreen
 from hero_skills import *
 from dummy_enemies import *
 
@@ -15,6 +17,7 @@ MODE = "menu"
 main_menu = MainMenu(WIDTH, HEIGHT)
 battle_screen = None
 party_screen = None
+selection_screen = None
 
 background = Actor("purple_space")
 
@@ -107,17 +110,7 @@ def draw():
         main_menu.render()
 
     elif MODE == "choice":
-        for i, a in enumerate(aliens):
-            x = 95 + 100 * i
-            y = 100
-            screen.draw.text(a.name, midtop=(x + 32, y + 100))
-            if a.image_base == "alien_yellow":
-                y += 10
-            a.actor.topleft = x, y
-            a.actor.draw()
-
-        draw_description()
-        draw_buttons()
+        selection_screen.render(party)
 
     elif MODE == "party":
         party_screen.render()
@@ -142,12 +135,13 @@ def on_mouse_down(pos):
     global desc_text
     global party, enemies, everyone
     global MODE
-    global main_menu, battle_screen, party_screen
+    global main_menu, battle_screen, party_screen, selection_screen
     global active_skill, cur_actor
 
     if MODE == "menu":
         if main_menu.menu_start.collidepoint(pos):
             MODE = "choice"
+            selection_screen = SelectionScreen(screen, PADDING, aliens)
         if main_menu.menu_load.collidepoint(pos):
             print("Not implemented yet! Sorry")
         if main_menu.menu_credits.collidepoint(pos):
@@ -287,7 +281,7 @@ def on_key_up(key):
     if MODE == "battle":
         num_keys = [f"K_{x}" for x in range(1, 10)]
         if key.name in num_keys:
-            # TODO: проверять, есть ли вообще такой скилл у текущего игрока
+            # TODO: проверять, хватает ли маны на выбранный скилл
             key_no = int(key.name.split("_")[1])
             if key_no <= len(everyone[cur_actor].skills):
                 active_skill = key_no
