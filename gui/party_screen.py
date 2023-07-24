@@ -1,7 +1,6 @@
 from pygame import Rect
-from pgzero.actor import Actor
 
-from gui.base import c_red, c_blue, Panel
+from gui.base import c_red, c_blue, Panel, NextBtn
 
 
 ########################################
@@ -107,15 +106,6 @@ class InventoryPanel:
         self.box.render()
         for slot in self.slots:
             slot.render()
-
-
-class NextBtn:
-    def __init__(self, screen, padding):
-        self.actor = Actor("arrow_green")
-        self.actor.bottomright = screen.width - 2 * padding, screen.height
-
-    def render(self):
-        self.actor.draw()
 
 
 class PartyScreen:
