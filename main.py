@@ -1,6 +1,5 @@
 from pgzero.actor import Actor
 # from pgzero.game import screen  # game won't start with this import line
-from pygame import Rect
 
 from gui.selection_screen import SelectionScreen
 from hero_skills import *
@@ -9,15 +8,12 @@ from dummy_enemies import *
 from classes import Char, Weapon, Armor
 from gui.main_menu import MainMenu
 from gui.battle_screen import BattleScreen
-from gui.party_screen import HorBar, PartyScreen
+from gui.party_screen import PartyScreen
 from gui.base import c_red, c_blue
 from config import *
 
 MODE = "menu"
-main_menu = MainMenu(WIDTH, HEIGHT)
-battle_screen = None
-party_screen = None
-selection_screen = None
+gui = MainMenu(WIDTH, HEIGHT)
 
 background = Actor("purple_space")
 
@@ -68,12 +64,10 @@ inv = [dummy_gun, dummy_sword, dummy_shield, dummy_umbrella]
 active_skill = 1
 cur_actor = None
 
-desc_text = "Select your party. You can choose three members"
-
 
 def make_turn(author, target, skill):
     global cur_actor, active_skill, everyone
-    global battle_screen
+    global gui
     global enemies  # DEBUG
 
     if author.mp >= skill.mp_cost:
@@ -82,70 +76,46 @@ def make_turn(author, target, skill):
         skill.affect_target(target, 30)
 
         active_skill = 1
-        battle_screen.skill_panel.set_active_skill(1)
+        gui.skill_panel.set_active_skill(1)
 
         if cur_actor < (len(everyone) - 1):
             cur_actor += 1
         else:
             cur_actor = 0
 
-        battle_screen.highlight(everyone[cur_actor])
-        battle_screen.update_skill_panel(everyone[cur_actor])
+        gui.highlight(everyone[cur_actor])
+        gui.update_skill_panel(everyone[cur_actor])
 
-        # print(f"{author} targets {target} using {skill}")
-        # print(f"Current actor: {everyone[cur_actor]}")
         message = f"{author} targets {target} using {skill}. Now it's {everyone[cur_actor]}'s turn"
     else:
         message = f"Not enough MP!"
-    battle_screen.info_panel.print(message)
+    gui.info_panel.print(message)
 
 
 def draw():
-    global active_skill
-
     screen.clear()
     background.draw()
 
-    if MODE == "menu":
-        main_menu.render()
-
+    if MODE in ("menu", "party", "battle"):
+        gui.render()
     elif MODE == "choice":
-        selection_screen.render(party)
-
-    elif MODE == "party":
-        party_screen.render()
-
-    elif MODE == "battle":
-        battle_screen.render()
-
-
-def draw_description():
-    screen.draw.text(desc_text,
-                     midtop=(WIDTH / 2, HEIGHT / 2 + 80),
-                     width=500)
-
-
-def draw_buttons():
-    quit_btn.draw()
-    if len(party) == 3:
-        next_btn.draw()
+        gui.render(party)
 
 
 def on_mouse_down(pos):
     global desc_text
     global party, enemies, everyone
-    global MODE
-    global main_menu, battle_screen, party_screen, selection_screen
+    global MODE, gui
     global active_skill, cur_actor
 
     if MODE == "menu":
-        if main_menu.menu_start.collidepoint(pos):
+        if gui.menu_start.collidepoint(pos):
             MODE = "choice"
-            selection_screen = SelectionScreen(screen, PADDING, aliens)
-        if main_menu.menu_load.collidepoint(pos):
+            gui = SelectionScreen(screen, PADDING, aliens)
+        elif gui.menu_load.collidepoint(pos):
             print("Not implemented yet! Sorry")
-        if main_menu.menu_credits.collidepoint(pos):
-            print(main_menu.game_credits)
+        elif gui.menu_credits.collidepoint(pos):
+            print(gui.game_credits)
 
     elif MODE == "choice":
         for a in aliens:
@@ -161,13 +131,14 @@ def on_mouse_down(pos):
                     a.set_stand()
                     party.remove(a)
                     print(party)
+                # TODO: Fix this desc text!
                 desc_text = f"{a.desc}\nSTR {a.str} / DEX {a.dex} / CON {a.con} / INT {a.int}"
 
         if next_btn.collidepoint(pos):
             print("Starting game")
             for hero in party:
                 hero.set_stand()
-            party_screen = PartyScreen(screen, PADDING, party, inv)
+            gui = PartyScreen(screen, PADDING, party, inv)
             MODE = "party"
 
     elif MODE == "party":
@@ -176,7 +147,7 @@ def on_mouse_down(pos):
                 print(hero)
                 hero.funny_jump()
 
-        if party_screen.next_btn.actor.collidepoint(pos):
+        if gui.next_btn.actor.collidepoint(pos):
             print("Going into battle")
             # assigning slot numbers to the hero party:
             for i, hero in enumerate(party):
@@ -192,22 +163,22 @@ def on_mouse_down(pos):
             everyone = sorted(everyone, key=lambda x: x.dex, reverse=True)
             cur_actor = 0  # who makes a turn now
 
-            battle_screen = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
-                                         party, enemies, everyone, active_skill, everyone[cur_actor])
+            gui = BattleScreen(screen, PADDING, SKILL_PANEL_HEIGHT, INFO_PANEL_HEIGHT, QUEUE_PANEL_WIDTH,
+                               party, enemies, everyone, active_skill, everyone[cur_actor])
 
     elif MODE == "battle":
         if everyone[cur_actor] in party:
             target_actor = None
             if everyone[cur_actor].skills[active_skill - 1].target == "foe":
                 # then we should target the enemies only
-                for slot in battle_screen.enemy_panel.slots:
+                for slot in gui.enemy_panel.slots:
                     if slot.box.collidepoint(pos):
                         print(f"The enemy is on target: {slot.hero}")
                         target_actor = slot.hero
                 # TODO: check what skill is active now (melee|ranged & aim-mode)
             elif everyone[cur_actor].skills[active_skill - 1].target == "friend":
                 # then we are able to target only our friends
-                for slot in battle_screen.hero_panel.slots:
+                for slot in gui.hero_panel.slots:
                     if slot.box.collidepoint(pos):
                         print(f"The friend is on target: {slot.hero}")
                         target_actor = slot.hero
@@ -227,7 +198,7 @@ def on_mouse_down(pos):
 
 def on_mouse_move(pos):
     global active_skill, cur_actor
-    global battle_screen
+    global gui
     global everyone
     if MODE == "battle":
         # TODO: check whose turn is this (heroes or enemies)
@@ -236,7 +207,7 @@ def on_mouse_move(pos):
         target = everyone[cur_actor].skills[active_skill - 1].target
         if target == "friend":
             # TODO: untarget all the foe slots
-            for s in battle_screen.hero_panel.slots:
+            for s in gui.hero_panel.slots:
                 if s.box.collidepoint(pos):
                     if aim == "single":
                         s.set_target()
@@ -247,36 +218,36 @@ def on_mouse_move(pos):
                     s.set_untarget()
 
         if target == "foe":
-            for s in battle_screen.enemy_panel.slots:
+            for s in gui.enemy_panel.slots:
                 if s.box.collidepoint(pos):
                     if aim == "single":
                         s.set_target()
                     elif aim == "row":
                         if s.no in (1, 2, 3):
-                            battle_screen.enemy_panel.slots[0].set_target()
-                            battle_screen.enemy_panel.slots[1].set_target()
-                            battle_screen.enemy_panel.slots[2].set_target()
+                            gui.enemy_panel.slots[0].set_target()
+                            gui.enemy_panel.slots[1].set_target()
+                            gui.enemy_panel.slots[2].set_target()
                         elif s.no in (4, 5, 6):
-                            battle_screen.enemy_panel.slots[3].set_target()
-                            battle_screen.enemy_panel.slots[4].set_target()
-                            battle_screen.enemy_panel.slots[5].set_target()
+                            gui.enemy_panel.slots[3].set_target()
+                            gui.enemy_panel.slots[4].set_target()
+                            gui.enemy_panel.slots[5].set_target()
                     elif aim == "column":
                         if s.no in (1, 4):
-                            battle_screen.enemy_panel.slots[0].set_target()
-                            battle_screen.enemy_panel.slots[3].set_target()
+                            gui.enemy_panel.slots[0].set_target()
+                            gui.enemy_panel.slots[3].set_target()
                         elif s.no in (2, 5):
-                            battle_screen.enemy_panel.slots[1].set_target()
-                            battle_screen.enemy_panel.slots[4].set_target()
+                            gui.enemy_panel.slots[1].set_target()
+                            gui.enemy_panel.slots[4].set_target()
                         elif s.no in (3, 6):
-                            battle_screen.enemy_panel.slots[2].set_target()
-                            battle_screen.enemy_panel.slots[5].set_target()
+                            gui.enemy_panel.slots[2].set_target()
+                            gui.enemy_panel.slots[5].set_target()
                 else:
                     s.set_untarget()
 
 
 def on_key_up(key):
     global active_skill
-    global battle_screen
+    global gui
     global everyone, cur_actor
     if MODE == "battle":
         num_keys = [f"K_{x}" for x in range(1, 10)]
@@ -285,4 +256,4 @@ def on_key_up(key):
             key_no = int(key.name.split("_")[1])
             if key_no <= len(everyone[cur_actor].skills):
                 active_skill = key_no
-                battle_screen.skill_panel.set_active_skill(key_no)
+                gui.skill_panel.set_active_skill(key_no)
