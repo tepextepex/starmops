@@ -1,52 +1,7 @@
-from pgzero.actor import Actor
 from pygame import Rect
 
-c_white = (255, 255, 255, 128)
-c_red = (255, 87, 51)
-c_green = (76, 187, 23)
-c_blue = (117, 194, 246)
+from gui.base import c_red, c_blue, Panel
 
-
-class Panel:
-    def __init__(self, screen, padding, x, y, w, h, active=False):
-        self.screen = screen
-        self.padding = padding
-        if active:
-            self.c = c_green
-            self.active = True
-        else:
-            self.c = c_white
-            self.active = False
-
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-
-        self.box = Rect((self.x, self.y), (self.w, self.h))
-
-    def set_active(self):
-        self.active = True
-        self.c = c_green
-        # self.box = Rect((self.x, self.y), (self.w, self.h))
-
-    def set_normal(self):
-        self.active = False
-        self.c = c_white
-        # self.box = Rect((self.x, self.y), (self.w, self.h))
-
-    def set_target(self):
-        self.c = c_red
-
-    def set_untarget(self):
-        if self.active:
-            self.c = c_green
-        else:
-            self.c = c_white
-
-    def render(self):
-        self.box = Rect((self.x, self.y), (self.w, self.h))
-        self.screen.draw.rect(self.box, self.c)
 
 ########################################
 ### GUI panels for the battle screen ###
@@ -167,31 +122,6 @@ class QueuePanel(Panel):
             self.screen.draw.text(f"Q {hero.dex * 10}",
                                   midleft=(hero_x + self.badge_size * 1.5 + self.padding,
                                            hero_y + self.badge_size / 2))
-
-
-class HorBar:
-    def __init__(self, screen, left, top, height, width, value, max_value, color):
-        self.screen = screen
-        self.left = left
-        self.top = top
-        self.width = width
-        self.height = height
-        self.color = color
-        self.value = value
-        self.max_value = max_value
-
-        self.cur_width = round(value / self.max_value * self.width)
-        if (self.cur_width == 0) and (self.value > 0):
-            self.cur_width = 1  # should be at least 1px if hp/mp is not zero
-        self.cur_left = left
-        self.box = Rect((self.cur_left, self.top), (self.cur_width, self.height))
-
-    def render(self):
-        self.screen.draw.filled_rect(self.box, self.color)
-        self.screen.draw.text(f"{self.value}/{self.max_value}",
-                              midtop=(self.left + self.width / 2, self.top),
-                              width=self.width,
-                              fontsize=18)
 
 
 class VertBar:

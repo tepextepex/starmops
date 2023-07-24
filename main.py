@@ -6,13 +6,15 @@ from dummy_enemies import *
 
 from classes import Char, Weapon, Armor
 from gui.main_menu import MainMenu
-from gui.battle_screen import BattleScreen, HorBar
-from gui.battle_screen import c_red, c_blue
+from gui.battle_screen import BattleScreen
+from gui.party_screen import HorBar, PartyScreen
+from gui.base import c_red, c_blue
 from config import *
 
 MODE = "menu"
 main_menu = MainMenu(WIDTH, HEIGHT)
 battle_screen = None
+party_screen = None
 
 background = Actor("purple_space")
 
@@ -21,9 +23,6 @@ quit_btn.bottomleft = 0 + PADDING, HEIGHT
 
 next_btn = Actor("arrow_green")
 next_btn.bottomright = WIDTH - PADDING, HEIGHT
-
-battle_btn = Actor("arrow_green")
-battle_btn.bottomright = WIDTH - PADDING, HEIGHT
 
 green = Char("Hodor", "alien_green",
              "Hodor is the tank. THE tank. He is a tough guy who defends his dudes",
@@ -100,7 +99,6 @@ def make_turn(author, target, skill):
 
 def draw():
     global active_skill
-    # global hero_panel, enemy_panel
 
     screen.clear()
     background.draw()
@@ -121,66 +119,10 @@ def draw():
         draw_description()
         draw_buttons()
 
-    elif MODE == "inv":
-        P = PADDING
-        c = (255, 255, 255, 128)
-
-        # hero panels:
-        bars = []
-        for i, hero in enumerate(party):
-            # print(i, hero)
-            w = (WIDTH - P * 4) / 3
-            h = HEIGHT / 2 - P
-            x = P * (i + 1) + i * w
-            y = P
-            p_box = Rect((x, y),
-                         (w, h))
-            screen.draw.rect(p_box, c)
-            screen.draw.text(hero.name, midtop=(x + w / 2, y + P))
-
-            y = y + 3 * P
-            if hero.image_base == "alien_yellow":
-                y += 10
-            hero.actor.midtop = (x + w / 2, y)
-            # hero.set_stand()
-            hero.actor.draw()
-
-            # drawing hero stats:
-            y = 2 * P + h / 2
-            # HP and MP bars:
-            bars.append(HorBar(screen, x + 10, y + 4, 12, w - 20, hero.hp, hero.max_hp(), c_red))
-            bars.append(HorBar(screen, x + 10, y + 20, 12, w - 20, hero.mp, hero.max_mp(), c_blue))
-            # column 1
-            #screen.draw.text(f"MAX HP {hero.max_hp()}", midtop=(x + w / 4, y + P))
-            screen.draw.text(f"STR {hero.str}", midtop=(x + w / 4, y + 4 * P))
-            screen.draw.text(f"DEX {hero.dex}", midtop=(x + w / 4, y + 7 * P))
-            # column 2
-            #screen.draw.text(f"MAX MP {hero.max_mp()}", midtop=(x + 3 * w / 4, y + P))
-            screen.draw.text(f"CON {hero.con}", midtop=(x + 3 * w / 4, y + 4 * P))
-            screen.draw.text(f"INT {hero.int}", midtop=(x + 3 * w / 4, y + 7 * P))
-
-        for bar in bars:
-            bar.render()
-        # inventory panel:
-        x = P
-        y = P + HEIGHT / 2
-        w = WIDTH - 2 * P
-        i_box = Rect((x, y),
-                     (w, HEIGHT / 2 - 2 * P))
-        screen.draw.rect(i_box, c)
-        screen.draw.text("Inventory", midtop=(WIDTH / 2, y + P))
-
-        # items in inventory:
-        for i, item in enumerate(inv):
-            x = P + i * 70
-            item.actor.topleft = (x, y + 4 * P)
-            item.actor.draw()
-        # buttons:
-        battle_btn.draw()
+    elif MODE == "party":
+        party_screen.render()
 
     elif MODE == "battle":
-        background.draw()
-
         battle_screen.render()
 
 
@@ -200,7 +142,7 @@ def on_mouse_down(pos):
     global desc_text
     global party, enemies, everyone
     global MODE
-    global main_menu, battle_screen
+    global main_menu, battle_screen, party_screen
     global active_skill, cur_actor
 
     if MODE == "menu":
@@ -231,15 +173,16 @@ def on_mouse_down(pos):
             print("Starting game")
             for hero in party:
                 hero.set_stand()
-            MODE = "inv"
+            party_screen = PartyScreen(screen, PADDING, party, inv)
+            MODE = "party"
 
-    elif MODE == "inv":
+    elif MODE == "party":
         for hero in party:
             if hero.actor.collidepoint(pos):
                 print(hero)
                 hero.funny_jump()
 
-        if battle_btn.collidepoint(pos):
+        if party_screen.next_btn.actor.collidepoint(pos):
             print("Going into battle")
             # assigning slot numbers to the hero party:
             for i, hero in enumerate(party):
