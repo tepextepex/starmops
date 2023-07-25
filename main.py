@@ -131,8 +131,7 @@ def on_mouse_down(pos):
                     a.set_stand()
                     party.remove(a)
                     print(party)
-                # TODO: Fix this desc text!
-                desc_text = f"{a.desc}\nSTR {a.str} / DEX {a.dex} / CON {a.con} / INT {a.int}"
+                gui.update_desc(f"{a.desc}\nSTR {a.str} / DEX {a.dex} / CON {a.con} / INT {a.int}")
 
         if next_btn.collidepoint(pos):
             print("Starting game")

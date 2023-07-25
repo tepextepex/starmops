@@ -21,6 +21,9 @@ class SelectionScreen:
         self.desc_text = "Select your party. You can choose three members"
         self.next_btn = NextBtn(self.screen, padding)
 
+    def update_desc(self, new_desc):
+        self.desc_text = new_desc
+
     def render(self, party):
         for c in self.chars:
             c.actor.draw()
