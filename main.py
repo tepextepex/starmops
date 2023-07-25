@@ -202,46 +202,49 @@ def on_mouse_move(pos):
     if MODE == "battle":
         if everyone[cur_actor] in party:  # highlight works only during the player's turn
             # TODO: check what skill is active now (melee|ranged & aim-mode)
-            aim = everyone[cur_actor].skills[active_skill - 1].aim
             target = everyone[cur_actor].skills[active_skill - 1].target
-            if target == "friend":
-                # TODO: untarget all the foe slots
-                for s in gui.hero_panel.slots:
-                    if s.box.collidepoint(pos):
-                        if aim == "single":
-                            s.set_target()
-                        elif aim == "self":
-                            if s.hero == everyone[cur_actor]:
-                                s.set_target()
+            panel = gui.hero_panel if target == "friend" else gui.enemy_panel
+            inactive_panel = gui.enemy_panel if target == "friend" else gui.hero_panel
+
+            # checking slots of the active panel for collision:
+            selection = None
+            for s in panel.slots:
+                if s.box.collidepoint(pos):
+                    selection = s
+
+            if selection is not None:
+                # choosing which slots should be highlighted, according to the skill's target mode:
+                highlight = ()
+                aim = everyone[cur_actor].skills[active_skill - 1].aim
+                if aim == "self":
+                    if selection.hero == everyone[cur_actor]:
+                        highlight = (selection.no, )
+                elif aim == "single":
+                    highlight = (selection.no, )
+                elif aim == "row":
+                    if selection.no in (1, 2, 3):
+                        highlight = (1, 2, 3)
+                    else:  # if selection.no in (4, 5, 6):
+                        highlight = (4, 5, 6)
+                elif aim == "column":
+                    if selection.no in (1, 4):
+                        highlight = (1, 4)
+                    elif selection.no in (2, 5):
+                        highlight = (2, 5)
+                    else:  # if s.no in (3, 6):
+                        highlight = (3, 6)
+
+                for s in panel.slots:
+                    if s.no in highlight:
+                        s.set_target()
                     else:
                         s.set_untarget()
 
-            if target == "foe":
-                for s in gui.enemy_panel.slots:
-                    if s.box.collidepoint(pos):
-                        if aim == "single":
-                            s.set_target()
-                        elif aim == "row":
-                            if s.no in (1, 2, 3):
-                                gui.enemy_panel.slots[0].set_target()
-                                gui.enemy_panel.slots[1].set_target()
-                                gui.enemy_panel.slots[2].set_target()
-                            elif s.no in (4, 5, 6):
-                                gui.enemy_panel.slots[3].set_target()
-                                gui.enemy_panel.slots[4].set_target()
-                                gui.enemy_panel.slots[5].set_target()
-                        elif aim == "column":
-                            if s.no in (1, 4):
-                                gui.enemy_panel.slots[0].set_target()
-                                gui.enemy_panel.slots[3].set_target()
-                            elif s.no in (2, 5):
-                                gui.enemy_panel.slots[1].set_target()
-                                gui.enemy_panel.slots[4].set_target()
-                            elif s.no in (3, 6):
-                                gui.enemy_panel.slots[2].set_target()
-                                gui.enemy_panel.slots[5].set_target()
-                    else:
-                        s.set_untarget()
+                for s in inactive_panel.slots:
+                    s.set_untarget()
+            else:
+                for s in panel.slots + inactive_panel.slots:
+                    s.set_untarget()
 
 
 def on_key_up(key):
