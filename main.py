@@ -220,7 +220,8 @@ def on_mouse_move(pos):
                     if selection.hero == everyone[cur_actor]:
                         highlight = (selection.no, )
                 elif aim == "single":
-                    highlight = (selection.no, )
+                    if selection.hero is not None:
+                        highlight = (selection.no, )
                 elif aim == "row":
                     if selection.no in (1, 2, 3):
                         highlight = (1, 2, 3)
