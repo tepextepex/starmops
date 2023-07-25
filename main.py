@@ -1,21 +1,18 @@
 from pgzero.actor import Actor
 # from pgzero.game import screen  # game won't start with this import line
-
-from gui.selection_screen import SelectionScreen
 from hero_skills import *
 from dummy_enemies import *
 
-from classes import Char, Weapon, Armor
 from gui.main_menu import MainMenu
+from gui.selection_screen import SelectionScreen
 from gui.battle_screen import BattleScreen
 from gui.party_screen import PartyScreen
 from gui.base import c_red, c_blue
 from config import *
+from init_game import init_game
 
 MODE = "menu"
 gui = MainMenu(WIDTH, HEIGHT)
-
-background = Actor("purple_space")
 
 quit_btn = Actor("arrow_red")
 quit_btn.bottomleft = 0 + PADDING, HEIGHT
@@ -23,43 +20,11 @@ quit_btn.bottomleft = 0 + PADDING, HEIGHT
 next_btn = Actor("arrow_green")
 next_btn.bottomright = WIDTH - PADDING, HEIGHT
 
-green = Char("Hodor", "alien_green",
-             "Hodor is the tank. THE tank. He is a tough guy who defends his dudes",
-             7, 3, 10, 5)
-green.learn(melee_attack, hold)
-
-blue = Char("Jebediah", "alien_blue",
-            "Jebediah is a jebedi knight. Wily and agile, he prefers melee combat using lasersabers",
-            3, 10, 7, 5)
-blue.learn(melee_attack, ranged_attack)
-
-pink = Char("Scarface", "alien_pink",
-            "Scarface is always smiling, but don't fall for this. He is fierce and adores to dismember his opponents",
-            10, 5, 7, 3)
-pink.learn(melee_attack, rage)
-
-yellow = Char("Eastwood", "alien_yellow",
-              "A gunslinger without a name. Everybody calls him Eastwood but we have no idea why",
-              3, 10, 5, 7)
-yellow.learn(ranged_attack, piercing_shot)
-
-beige = Char("Pope", "alien_beige",
-             "Pope is a master spellcaster. He has an essential ability to heal his allies",
-             3, 5, 7, 10)
-beige.learn(heal, ranged_attack)
-
-aliens = (green, blue, pink, yellow, beige)
+aliens, inv = init_game()
 
 party = []
 enemies = []
 everyone = party + enemies
-
-dummy_gun = Weapon("ranged", "Ray gun", "raygun", 10)
-dummy_sword = Weapon("melee", "Rusty sword", "sword_bronze", 15)
-dummy_shield = Armor("dummy", "Wooden shield", "shield_bronze", 5)
-dummy_umbrella = Armor("dummy", "Umbrella", "umbrella_open", 2)
-
-inv = [dummy_gun, dummy_sword, dummy_shield, dummy_umbrella]
 
 active_skill = 1
 cur_actor = None
