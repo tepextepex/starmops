@@ -200,48 +200,48 @@ def on_mouse_move(pos):
     global gui
     global everyone
     if MODE == "battle":
-        # TODO: check whose turn is this (heroes or enemies)
-        # TODO: check what skill is active now (melee|ranged & aim-mode)
-        aim = everyone[cur_actor].skills[active_skill - 1].aim
-        target = everyone[cur_actor].skills[active_skill - 1].target
-        if target == "friend":
-            # TODO: untarget all the foe slots
-            for s in gui.hero_panel.slots:
-                if s.box.collidepoint(pos):
-                    if aim == "single":
-                        s.set_target()
-                    elif aim == "self":
-                        if s.hero == everyone[cur_actor]:
+        if everyone[cur_actor] in party:  # highlight works only during the player's turn
+            # TODO: check what skill is active now (melee|ranged & aim-mode)
+            aim = everyone[cur_actor].skills[active_skill - 1].aim
+            target = everyone[cur_actor].skills[active_skill - 1].target
+            if target == "friend":
+                # TODO: untarget all the foe slots
+                for s in gui.hero_panel.slots:
+                    if s.box.collidepoint(pos):
+                        if aim == "single":
                             s.set_target()
-                else:
-                    s.set_untarget()
+                        elif aim == "self":
+                            if s.hero == everyone[cur_actor]:
+                                s.set_target()
+                    else:
+                        s.set_untarget()
 
-        if target == "foe":
-            for s in gui.enemy_panel.slots:
-                if s.box.collidepoint(pos):
-                    if aim == "single":
-                        s.set_target()
-                    elif aim == "row":
-                        if s.no in (1, 2, 3):
-                            gui.enemy_panel.slots[0].set_target()
-                            gui.enemy_panel.slots[1].set_target()
-                            gui.enemy_panel.slots[2].set_target()
-                        elif s.no in (4, 5, 6):
-                            gui.enemy_panel.slots[3].set_target()
-                            gui.enemy_panel.slots[4].set_target()
-                            gui.enemy_panel.slots[5].set_target()
-                    elif aim == "column":
-                        if s.no in (1, 4):
-                            gui.enemy_panel.slots[0].set_target()
-                            gui.enemy_panel.slots[3].set_target()
-                        elif s.no in (2, 5):
-                            gui.enemy_panel.slots[1].set_target()
-                            gui.enemy_panel.slots[4].set_target()
-                        elif s.no in (3, 6):
-                            gui.enemy_panel.slots[2].set_target()
-                            gui.enemy_panel.slots[5].set_target()
-                else:
-                    s.set_untarget()
+            if target == "foe":
+                for s in gui.enemy_panel.slots:
+                    if s.box.collidepoint(pos):
+                        if aim == "single":
+                            s.set_target()
+                        elif aim == "row":
+                            if s.no in (1, 2, 3):
+                                gui.enemy_panel.slots[0].set_target()
+                                gui.enemy_panel.slots[1].set_target()
+                                gui.enemy_panel.slots[2].set_target()
+                            elif s.no in (4, 5, 6):
+                                gui.enemy_panel.slots[3].set_target()
+                                gui.enemy_panel.slots[4].set_target()
+                                gui.enemy_panel.slots[5].set_target()
+                        elif aim == "column":
+                            if s.no in (1, 4):
+                                gui.enemy_panel.slots[0].set_target()
+                                gui.enemy_panel.slots[3].set_target()
+                            elif s.no in (2, 5):
+                                gui.enemy_panel.slots[1].set_target()
+                                gui.enemy_panel.slots[4].set_target()
+                            elif s.no in (3, 6):
+                                gui.enemy_panel.slots[2].set_target()
+                                gui.enemy_panel.slots[5].set_target()
+                    else:
+                        s.set_untarget()
 
 
 def on_key_up(key):
