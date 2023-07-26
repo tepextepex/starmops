@@ -22,6 +22,17 @@ class Char:
         self.hp = self.max_hp()
         self.mp = self.max_mp()
         self.only_target = False  # TODO: how to unset this option?
+        self.dead = False
+
+    def kill(self):
+        self.hp = 0
+        self.dead = True
+        self.actor.image = f"{self.image_base}_duck"
+
+    def revive(self):
+        self.hp = self.max_hp() / 4
+        self.dead = False
+        self.actor.image = self.image_base
 
     def max_hp(self):
         return self.con * 10 + 50
@@ -83,6 +94,8 @@ class Skill:
 
     def affect_target(self, target, value):
         self.effect(target, value)
+        if target.hp == 0:
+            target.kill()
 
     def __repr__(self):
         return f"{self.name}"

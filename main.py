@@ -30,7 +30,15 @@ active_skill = 1
 cur_actor = None
 
 
-def make_turn(author, target, skill):
+def next_turn():
+    global cur_actor, everyone
+    if cur_actor < (len(everyone) - 1):
+        cur_actor += 1
+    else:
+        cur_actor = 0
+
+
+def perform(author, target, skill):
     global cur_actor, active_skill, everyone
     global gui
     global enemies  # DEBUG
@@ -43,10 +51,7 @@ def make_turn(author, target, skill):
         active_skill = 1
         gui.skill_panel.set_active_skill(1)
 
-        if cur_actor < (len(everyone) - 1):
-            cur_actor += 1
-        else:
-            cur_actor = 0
+        next_turn()
 
         gui.highlight(everyone[cur_actor])
         gui.update_skill_panel(everyone[cur_actor])
@@ -133,31 +138,41 @@ def on_mouse_down(pos):
     elif MODE == "battle":
         if everyone[cur_actor] in party:
             target_actor = None
-            if everyone[cur_actor].skills[active_skill - 1].target == "foe":
-                # then we should target the enemies only
-                for slot in gui.enemy_panel.slots:
-                    if slot.box.collidepoint(pos):
-                        print(f"The enemy is on target: {slot.hero}")
-                        target_actor = slot.hero
-                # TODO: check what skill is active now (melee|ranged & aim-mode)
-            elif everyone[cur_actor].skills[active_skill - 1].target == "friend":
-                # then we are able to target only our friends
-                for slot in gui.hero_panel.slots:
-                    if slot.box.collidepoint(pos):
-                        print(f"The friend is on target: {slot.hero}")
-                        target_actor = slot.hero
-                # TODO: check what skill is active now (melee|ranged & aim-mode)
-            if target_actor is not None:
-                make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+            if everyone[cur_actor].dead:
+                next_turn()
+                message = f"Now it's {everyone[cur_actor]}'s turn"
+                gui.info_panel.print(message)
+            else:
+                if everyone[cur_actor].skills[active_skill - 1].target == "foe":
+                    # then we should target the enemies only
+                    for slot in gui.enemy_panel.slots:
+                        if slot.box.collidepoint(pos):
+                            # print(f"The enemy is on target: {slot.hero}")
+                            target_actor = slot.hero
+                    # TODO: check what skill is active now (melee|ranged & aim-mode)
+                elif everyone[cur_actor].skills[active_skill - 1].target == "friend":
+                    # then we are able to target only our friends
+                    for slot in gui.hero_panel.slots:
+                        if slot.box.collidepoint(pos):
+                            # print(f"The friend is on target: {slot.hero}")
+                            target_actor = slot.hero
+                    # TODO: check what skill is active now (melee|ranged & aim-mode)
+                if target_actor is not None:
+                    perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
 
         elif everyone[cur_actor] in enemies:
             # TODO: to be replaced with the automated enemy attacks
-            target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
-            # however, if some of the heroes activated the only_target skill, then AI chooses him:
-            for hero in party:
-                if hero.only_target:
-                    target_actor = hero
-            make_turn(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+            if everyone[cur_actor].dead:
+                next_turn()
+                message = f"Now it's {everyone[cur_actor]}'s turn"
+                gui.info_panel.print(message)
+            else:
+                target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
+                # however, if some of the heroes activated the only_target skill, then AI chooses him:
+                for hero in party:
+                    if hero.only_target:
+                        target_actor = hero
+                perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
 
 
 def on_mouse_move(pos):
