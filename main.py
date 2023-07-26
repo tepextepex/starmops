@@ -1,4 +1,6 @@
 from pgzero.actor import Actor
+
+from gui.result_screen import ResultScreen
 # from pgzero.game import screen  # game won't start with this import line
 from hero_skills import *
 from dummy_enemies import *
@@ -28,6 +30,26 @@ everyone = party + enemies
 
 active_skill = 1
 cur_actor = None
+
+
+def check_end():
+    global party, enemies
+    global MODE, gui
+    all_dead = True
+    for hero in party:
+        if hero.dead is not True:
+            all_dead = False
+    if all_dead:
+        MODE = "result"
+        gui = ResultScreen(screen, False)
+
+    all_dead = True
+    for enemy in enemies:
+        if enemy.dead is not True:
+            all_dead = False
+    if all_dead:
+        MODE = "result"
+        gui = ResultScreen(screen, True)
 
 
 def next_turn():
@@ -66,7 +88,7 @@ def draw():
     screen.clear()
     background.draw()
 
-    if MODE in ("menu", "party", "battle"):
+    if MODE in ("menu", "party", "battle", "result"):
         gui.render()
     elif MODE == "choice":
         gui.render(party)
@@ -142,6 +164,7 @@ def on_mouse_down(pos):
                 next_turn()
                 message = f"Now it's {everyone[cur_actor]}'s turn"
                 gui.info_panel.print(message)
+                check_end()
             else:
                 if everyone[cur_actor].skills[active_skill - 1].target == "foe":
                     # then we should target the enemies only
@@ -159,6 +182,7 @@ def on_mouse_down(pos):
                     # TODO: check what skill is active now (melee|ranged & aim-mode)
                 if target_actor is not None:
                     perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+                    check_end()
 
         elif everyone[cur_actor] in enemies:
             # TODO: to be replaced with the automated enemy attacks
@@ -166,6 +190,7 @@ def on_mouse_down(pos):
                 next_turn()
                 message = f"Now it's {everyone[cur_actor]}'s turn"
                 gui.info_panel.print(message)
+                check_end()
             else:
                 target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
                 # however, if some of the heroes activated the only_target skill, then AI chooses him:
@@ -173,6 +198,7 @@ def on_mouse_down(pos):
                     if hero.only_target:
                         target_actor = hero
                 perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+                check_end()
 
 
 def on_mouse_move(pos):
