@@ -41,7 +41,7 @@ def check_end():
             all_dead = False
     if all_dead:
         MODE = "result"
-        gui = ResultScreen(screen, False)
+        gui = ResultScreen(screen, PADDING, False)
 
     all_dead = True
     for enemy in enemies:
@@ -49,7 +49,7 @@ def check_end():
             all_dead = False
     if all_dead:
         MODE = "result"
-        gui = ResultScreen(screen, True)
+        gui = ResultScreen(screen, PADDING, True)
 
 
 def next_turn():
@@ -199,6 +199,11 @@ def on_mouse_down(pos):
                         target_actor = hero
                 perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
                 check_end()
+
+    elif MODE == "result":
+        if gui.next_btn.actor.collidepoint(pos):
+            gui = PartyScreen(screen, PADDING, party, inv)
+            MODE = "party"
 
 
 def on_mouse_move(pos):
