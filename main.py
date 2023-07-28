@@ -31,6 +31,8 @@ everyone = party + enemies
 active_skill = 1
 cur_actor = None
 
+target_list = []
+
 
 def check_end():
     global party, enemies
@@ -60,7 +62,7 @@ def next_turn():
         cur_actor = 0
 
 
-def perform(author, target, skill):
+def perform(author, targets, skill):
     global cur_actor, active_skill, everyone
     global gui
     global enemies  # DEBUG
@@ -68,7 +70,7 @@ def perform(author, target, skill):
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
         # TODO: compute "value" based on hero stats and current weapon
-        skill.affect_target(target, 30)
+        skill.affect_target(30, *targets)
 
         active_skill = 1
         gui.skill_panel.set_active_skill(1)
@@ -78,7 +80,7 @@ def perform(author, target, skill):
         gui.highlight(everyone[cur_actor])
         gui.update_skill_panel(everyone[cur_actor])
 
-        message = f"{author} targets {target} using {skill}. Now it's {everyone[cur_actor]}'s turn"
+        message = f"{author} targets {targets} using {skill}. Now it's {everyone[cur_actor]}'s turn"
     else:
         message = f"Not enough MP!"
     gui.info_panel.print(message)
@@ -95,10 +97,10 @@ def draw():
 
 
 def on_mouse_down(pos):
-    global desc_text
     global party, enemies, everyone
     global MODE, gui
     global active_skill, cur_actor
+    global target_list
 
     if MODE == "menu":
         if gui.menu_start.collidepoint(pos):
@@ -158,32 +160,19 @@ def on_mouse_down(pos):
                                party, enemies, everyone, active_skill, everyone[cur_actor])
 
     elif MODE == "battle":
+        # 1) Handling the player's turns:
         if everyone[cur_actor] in party:
-            target_actor = None
             if everyone[cur_actor].dead:
                 next_turn()
                 message = f"Now it's {everyone[cur_actor]}'s turn"
                 gui.info_panel.print(message)
                 check_end()
             else:
-                if everyone[cur_actor].skills[active_skill - 1].target == "foe":
-                    # then we should target the enemies only
-                    for slot in gui.enemy_panel.slots:
-                        if slot.box.collidepoint(pos):
-                            # print(f"The enemy is on target: {slot.hero}")
-                            target_actor = slot.hero
-                    # TODO: check what skill is active now (melee|ranged & aim-mode)
-                elif everyone[cur_actor].skills[active_skill - 1].target == "friend":
-                    # then we are able to target only our friends
-                    for slot in gui.hero_panel.slots:
-                        if slot.box.collidepoint(pos):
-                            # print(f"The friend is on target: {slot.hero}")
-                            target_actor = slot.hero
-                    # TODO: check what skill is active now (melee|ranged & aim-mode)
-                if target_actor is not None:
-                    perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+                if len(target_list):
+                    perform(everyone[cur_actor], target_list, everyone[cur_actor].skills[active_skill - 1])
                     check_end()
 
+        # 2) Handling the enemies' turns:
         elif everyone[cur_actor] in enemies:
             # TODO: to be replaced with the automated enemy attacks
             if everyone[cur_actor].dead:
@@ -192,12 +181,12 @@ def on_mouse_down(pos):
                 gui.info_panel.print(message)
                 check_end()
             else:
-                target_actor = max(party, key=lambda x: x.hp)  # AI will always choose a hero with max HP
+                target_list = [max(party, key=lambda x: x.hp)]  # AI will always choose a hero with max HP
                 # however, if some of the heroes activated the only_target skill, then AI chooses him:
                 for hero in party:
                     if hero.only_target:
-                        target_actor = hero
-                perform(everyone[cur_actor], target_actor, everyone[cur_actor].skills[active_skill - 1])
+                        target_list = [hero]
+                perform(everyone[cur_actor], target_list, everyone[cur_actor].skills[active_skill - 1])
                 check_end()
 
     elif MODE == "result":
@@ -209,7 +198,7 @@ def on_mouse_down(pos):
 def on_mouse_move(pos):
     global active_skill, cur_actor
     global gui
-    global everyone
+    global everyone, target_list
     if MODE == "battle":
         if everyone[cur_actor] in party:  # highlight works only during the player's turn
             # TODO: check what skill is active now (melee|ranged & aim-mode)
@@ -227,24 +216,34 @@ def on_mouse_move(pos):
                 # choosing which slots should be highlighted, according to the skill's target mode:
                 highlight = ()
                 aim = everyone[cur_actor].skills[active_skill - 1].aim
+
                 if aim == "self":
                     if selection.hero == everyone[cur_actor]:
                         highlight = (selection.no, )
+                        target_list = [selection.hero]
                 elif aim == "single":
                     if selection.hero is not None:
                         highlight = (selection.no, )
+                        target_list = [selection.hero]
+                    else:
+                        target_list = []
                 elif aim == "row":
                     if selection.no in (1, 2, 3):
                         highlight = (1, 2, 3)
+                        target_list = [panel.slots[0].hero, panel.slots[1].hero, panel.slots[2].hero]
                     else:  # if selection.no in (4, 5, 6):
                         highlight = (4, 5, 6)
+                        target_list = [panel.slots[3].hero, panel.slots[4].hero, panel.slots[5].hero]
                 elif aim == "column":
                     if selection.no in (1, 4):
                         highlight = (1, 4)
+                        target_list = [panel.slots[0].hero, panel.slots[3].hero]
                     elif selection.no in (2, 5):
                         highlight = (2, 5)
+                        target_list = [panel.slots[1].hero, panel.slots[4].hero]
                     else:  # if s.no in (3, 6):
                         highlight = (3, 6)
+                        target_list = [panel.slots[2].hero, panel.slots[5].hero]
 
                 for s in panel.slots:
                     if s.no in highlight:
@@ -255,6 +254,7 @@ def on_mouse_move(pos):
                 for s in inactive_panel.slots:
                     s.set_untarget()
             else:
+                target_list = []
                 for s in panel.slots + inactive_panel.slots:
                     s.set_untarget()
 

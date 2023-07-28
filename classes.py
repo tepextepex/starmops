@@ -92,10 +92,11 @@ class Skill:
         self.mp_cost = mp_cost
         self.effect = effect  # should be a function to apply on target Char
 
-    def affect_target(self, target, value):
-        self.effect(target, value)
-        if target.hp == 0:
-            target.kill()
+    def affect_target(self, value, *targets):
+        self.effect(value, *targets)
+        for t in targets:
+            if t.hp == 0:
+                t.kill()
 
     def __repr__(self):
         return f"{self.name}"
