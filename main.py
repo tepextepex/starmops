@@ -1,15 +1,12 @@
-from pgzero.actor import Actor
-
-from gui.result_screen import ResultScreen
 # from pgzero.game import screen  # game won't start with this import line
-from hero_skills import *
 from dummy_enemies import *
 
 from gui.main_menu import MainMenu
 from gui.selection_screen import SelectionScreen
 from gui.battle_screen import BattleScreen
 from gui.party_screen import PartyScreen
-from gui.base import c_red, c_blue
+from gui.result_screen import ResultScreen
+
 from config import *
 from init_game import init_game
 
@@ -66,6 +63,8 @@ def perform(author, targets, skill):
     global cur_actor, active_skill, everyone
     global gui
     global enemies  # DEBUG
+
+    targets = [x for x in targets if x is not None]
 
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
