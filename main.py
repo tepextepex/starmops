@@ -1,5 +1,6 @@
 # from pgzero.game import screen  # game won't start with this import line
 from dummy_enemies import *
+from enemy_gen import spawn_dummy_enemies
 
 from gui.main_menu import MainMenu
 from gui.selection_screen import SelectionScreen
@@ -139,9 +140,7 @@ def on_mouse_down(pos):
             for i, hero in enumerate(party):
                 hero.slot_no = i + 1  # + 3
             # creating enemies party:
-            enemies = [mouse_1, spider, mouse_2, bat]
-            for e, i in zip(enemies, (1, 2, 3, 5)):
-                e.slot_no = i
+            enemies = spawn_dummy_enemies()
             MODE = "battle"
             active_skill = 1
 
