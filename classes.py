@@ -81,9 +81,10 @@ class Armor:
 
 
 class Skill:
-    def __init__(self, target, name, image, aim, ranged, uses, mp_cost, effect):
+    def __init__(self, target, name, description, image, aim, ranged, uses, mp_cost, effect):
         self.target = target  # friend or foe
         self.name = name
+        self.description = description
         self.image = image
         self.actor = Actor(image)
         self.aim = aim  # number of affected slots (single | row | column | area | self)
@@ -103,10 +104,11 @@ class Skill:
 
 
 class Attack(Skill):
-    def __init__(self, name, image, aim, ranged, uses, mp_cost, effect):
-        Skill.__init__(self, "foe", name, image, aim, ranged, uses, mp_cost, effect)
+    def __init__(self, name, description, image, aim, ranged, uses, mp_cost, effect):
+        Skill.__init__(self, "foe", name, description, image, aim, ranged, uses, mp_cost, effect)
 
 
 class Buff(Skill):
-    def __init__(self, name, image, aim, mp_cost, effect):
-        Skill.__init__(self, "friend", name, image, aim, True, "INT", mp_cost, effect)  # buffs are always ranged and use INT
+    def __init__(self, name, description, image, aim, mp_cost, effect):
+        # buffs are always ranged and use INT:
+        Skill.__init__(self, "friend", name, description, image, aim, True, "INT", mp_cost, effect)
