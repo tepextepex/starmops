@@ -13,12 +13,6 @@ from init_game import init_game
 MODE = "menu"
 gui = MainMenu(WIDTH, HEIGHT)
 
-quit_btn = Actor("arrow_red")
-quit_btn.bottomleft = 0 + PADDING, HEIGHT
-
-next_btn = Actor("arrow_green")
-next_btn.bottomright = WIDTH - PADDING, HEIGHT
-
 aliens, inv = init_game()
 
 party = []
@@ -126,8 +120,8 @@ def on_mouse_down(pos):
                     print(party)
                 gui.update_desc(f"{a.desc}\nSTR {a.str} / DEX {a.dex} / CON {a.con} / INT {a.int}")
 
-        if next_btn.collidepoint(pos):
-            print("Starting game")
+        if gui.next_btn.actor.collidepoint(pos):
+            print("Starting new game")
             for hero in party:
                 hero.set_stand()
             gui = PartyScreen(screen, PADDING, party, inv)
