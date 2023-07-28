@@ -58,6 +58,14 @@ class Char:
         for skill in skills:
             self.skills.append(skill)
 
+    def equip_weapon(self, weapon):
+        self.weapon = weapon
+        weapon.equipped = self
+
+    def equip_armor(self, armor):
+        self.armor = armor
+        armor.equipped = self
+
     def __repr__(self):
         return f"{self.name}"
 
@@ -69,6 +77,7 @@ class Weapon:
         self.image = image
         self.actor = Actor(image)
         self.attack = attack
+        self.equipped = None
 
 
 class Armor:
@@ -78,6 +87,7 @@ class Armor:
         self.image = image
         self.actor = Actor(image)
         self.defence = defence
+        self.equipped = None
 
 
 class Skill:

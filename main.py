@@ -1,5 +1,5 @@
 # from pgzero.game import screen  # game won't start with this import line
-from dummy_enemies import *
+# from dummy_enemies import *
 from enemy_gen import spawn_dummy_enemies
 
 from gui.main_menu import MainMenu
@@ -125,6 +125,11 @@ def on_mouse_down(pos):
             print("Starting new game")
             for hero in party:
                 hero.set_stand()
+            ####### DEBUG:
+            party[0].equip_weapon(inv[0])
+            party[1].equip_weapon(inv[1])
+            party[2].equip_weapon(inv[2])
+            ##############
             gui = PartyScreen(screen, PADDING, party, inv)
             MODE = "party"
 

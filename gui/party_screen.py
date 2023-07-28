@@ -43,12 +43,21 @@ class HeroPanel:
         self.hero = hero
         self.box = Panel(screen, padding, x, y, width, height, False)
         self.actor = hero.actor
-        self.actor.midbottom = (self.x + self.width / 2, self.y + padding + 90)
+        hero_mid_y = self.y + padding + 90
+        self.actor.midbottom = (self.x + self.width / 2, hero_mid_y)
         self.bars = []
         self.bars.append(
-            HorBar(screen, x + 10, self.y + padding + 90 + 25, 12, self.width - 20, self.hero.hp, self.hero.max_hp(), c_red))
+            HorBar(screen, x + 10, hero_mid_y + 25, 12, self.width - 20, self.hero.hp, self.hero.max_hp(), c_red))
         self.bars.append(
-            HorBar(screen, x + 10, self.y + padding + 90 + 40, 12, self.width - 20, self.hero.mp, self.hero.max_mp(), c_blue))
+            HorBar(screen, x + 10, hero_mid_y + 40, 12, self.width - 20, self.hero.mp, self.hero.max_mp(), c_blue))
+
+        equip_slot_size = 51
+        self.weapon_slot = EquipSlot(self.screen, self.padding,
+                                   self.x + padding, hero_mid_y - equip_slot_size,
+                                   equip_slot_size, equip_slot_size, self.hero.weapon)
+        self.armor_slot = EquipSlot(self.screen, self.padding,
+                                  self.x + self.width - equip_slot_size - padding, hero_mid_y - equip_slot_size,
+                                  equip_slot_size, equip_slot_size, self.hero.armor)
 
     def render(self):
         self.box.render()
@@ -57,6 +66,11 @@ class HeroPanel:
                               midtop=(self.x + self.width / 2, self.y + 105))
         for bar in self.bars:
             bar.render()
+
+        # slots with the equipped weapon and armor:
+        self.weapon_slot.render()
+        self.armor_slot.render()
+
         # column 1
         self.screen.draw.text(f"STR {self.hero.str}",
                               midtop=(self.x + self.width / 4, self.y + 125 + 4 * self.padding))
@@ -69,17 +83,32 @@ class HeroPanel:
                               midtop=(self.x + 3 * self.width / 4, self.y + 120 + 7 * self.padding))
 
 
-class InvSlot:
+class EquipSlot:
     def __init__(self, screen, padding, x, y, width, height, item):
         self.box = Panel(screen, padding, x, y, width, height, False)
         self.item = item
         if self.item is not None:
-            item.actor.center = (x + width / 2, y + height / 2)
+                item.actor.center = (x + width / 2, y + height / 2)
 
     def render(self):
         self.box.render()
         if self.item is not None:
             self.item.actor.draw()
+
+
+class InvSlot:
+    def __init__(self, screen, padding, x, y, width, height, item):
+        self.box = Panel(screen, padding, x, y, width, height, False)
+        self.item = item
+        if self.item is not None:
+            if self.item.equipped is None:
+                item.actor.center = (x + width / 2, y + height / 2)
+
+    def render(self):
+        self.box.render()
+        if self.item is not None:
+            if self.item.equipped is None:
+                self.item.actor.draw()
 
 
 class InventoryPanel:
@@ -92,6 +121,10 @@ class InventoryPanel:
         # slot_height = (height - (rows + 1) * padding) / rows
         slot_height = slot_width
         # print(slot_height)  # 51 px
+
+        # filtering out the items which are already equipped:
+        inventory = [x for x in inventory if x.equipped is None]
+
         item_no = 0
         for row in range(rows):
             slot_y = y + padding + row * (padding + slot_height)
