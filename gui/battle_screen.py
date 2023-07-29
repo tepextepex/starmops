@@ -1,6 +1,6 @@
 from pygame import Rect
 
-from gui.base import c_red, c_blue, Panel
+from gui.base import c_red, c_blue, c_white, Panel
 
 
 ########################################
@@ -15,21 +15,41 @@ class SkillSlot(Panel):
         self.size_x = size_x
         self.size_y = size_y
         self.no = number
+        self.popup = None
         if hero_skill is not None:
             self.hero_skill = hero_skill
         else:
             self.hero_skill = None
-        Panel.__init__(self, screen, padding, x, y, size_x, size_y, active=active)
-        # print(f"Hi dear I am the skillslot, my dimensions are {size_x}x{size_y}px")
+        Panel.__init__(self, screen, padding, x, y, size_x, size_y, active=active, fill=True)
 
     def update(self, hero_skill):
         self.hero_skill = hero_skill
+
+    def open_popup(self, pos):
+        self.popup = pos
+
+    def close_popup(self):
+        self.popup = None
 
     def render(self):
         Panel.render(self)
         if self.hero_skill is not None:
             self.hero_skill.actor.center = (self.x + self.size_x / 2, self.y + self.size_y / 2)
             self.hero_skill.actor.draw()
+        if self.popup:
+            p_size = 120
+            x, y = self.popup
+            y -= p_size
+            popup_background = Rect((x, y), (p_size, p_size))
+            self.screen.draw.filled_rect(popup_background, c_white)
+            self.screen.draw.text(self.hero_skill.name,
+                                  midtop=(x + p_size / 2, y + self.padding),
+                                  width=p_size - 2 * self.padding,
+                                  fontsize=20, color=(20, 20, 20))
+            self.screen.draw.text(self.hero_skill.description,
+                                  midtop=(x + p_size / 2, y + self.padding + 20),
+                                  width=p_size - 2 * self.padding,
+                                  fontsize=20, color=(40, 40, 40))
 
 
 class SkillPanel(Panel):
@@ -171,7 +191,7 @@ class Slot(Panel):
                                   hero.hp, hero.max_hp(), c_red)
             self.mp_bar = VertBar(screen, slot_x + slot_width - bar_w - 3, slot_y + 3, bar_h, bar_w,
                                   hero.mp, hero.max_mp(), c_blue)
-        Panel.__init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, active=active)
+        Panel.__init__(self, screen, padding, slot_x, slot_y, slot_width, slot_height, active=active, fill=True)
 
     def render(self):
         Panel.render(self)

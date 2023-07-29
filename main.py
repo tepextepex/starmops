@@ -28,6 +28,7 @@ target_list = []
 
 scheduled = False
 
+
 def check_end():
     global party, enemies
     global MODE, gui
@@ -279,6 +280,14 @@ def on_mouse_move(pos):
                 target_list = []
                 for s in panel.slots + inactive_panel.slots:
                     s.set_untarget()
+
+            # checking collisions with skill-slots to show pop-ups with descriptions:
+            for s in gui.skill_panel.skill_slots:
+                if s.box.collidepoint(pos):
+                    if s.hero_skill is not None:
+                        s.open_popup(pos)
+                else:
+                    s.close_popup()
 
 
 def on_key_up(key):

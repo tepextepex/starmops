@@ -27,10 +27,10 @@ melee_attack = Attack("Melee attack", "",
 ranged_attack = Attack("Ranged attack", "",
                        "raygun", "single", True, "DEX", 0, decrease_hp)
 
-swing = Attack("Blood harvest", "",
+swing = Attack("Blood harvest", "Attacks the entire row",
                "scythe", "row", False, "DEX", 50, decrease_hp)
 
-piercing_shot = Attack("Piercing shot", "",
+piercing_shot = Attack("Piercing shot", "Attacks two targets at the same time",
                        "bullet", "column", True, "DEX", 50, decrease_hp)
 
 heal = Buff("Heal", "",
@@ -42,5 +42,5 @@ hold = Buff("Hold the floor!", "",
 revive = Buff("Revive", "",
               "revive", "single", 40, revive_char)
 
-rage = Attack("Rage", "",
+rage = Attack("Rage", "150% attack on a single target",
               "angry_cat", "single", False, "STR", 30, decrease_hp)
