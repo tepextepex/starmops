@@ -127,11 +127,6 @@ def on_mouse_down(pos):
             print("Starting new game")
             for hero in party:
                 hero.set_stand()
-            ####### DEBUG:
-            party[0].equip_weapon(inv[0])
-            party[1].equip_weapon(inv[1])
-            party[2].equip_weapon(inv[2])
-            ##############
             gui = PartyScreen(screen, PADDING, party, inv)
             MODE = "party"
 

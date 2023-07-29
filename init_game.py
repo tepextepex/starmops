@@ -1,4 +1,4 @@
-from hero_skills import *
+from init_skills import *
 from classes import Char, Weapon, Armor
 
 
@@ -26,15 +26,22 @@ def init_game():
     Pope = Char("Pope", "alien_beige",
                  "Pope is a master spellcaster. He has an essential ability to heal his allies",
                 3, 5, 7, 10)
-    Pope.learn(melee_attack, ranged_attack, heal)
+    Pope.learn(melee_attack, ranged_attack, heal, revive)
 
     aliens = (Hodor, Jeb, Scar, East, Pope)
 
-    dummy_gun = Weapon("ranged", "Ray gun", "raygun", 10)
+    dummy_gun = Weapon("ranged", "Ray gun", "blaster", 10)
     dummy_sword = Weapon("melee", "Rusty sword", "sword_bronze", 15)
+    dummy_saw = Weapon("melee", "Rusty chainsaw", "chainsaw", 15)
+    dummy_saber = Weapon("melee", "Rusty lasersaber", "lasersaber", 15)
     dummy_shield = Armor("dummy", "Wooden shield", "shield_bronze", 5)
     dummy_umbrella = Armor("dummy", "Umbrella", "umbrella_open", 2)
 
-    inventory = [dummy_gun, dummy_sword, dummy_shield, dummy_umbrella]
+    inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_shield, dummy_umbrella]
+
+    Hodor.equip_weapon(dummy_sword)
+    Jeb.equip_weapon(dummy_saber)
+    Scar.equip_weapon(dummy_saw)
+    East.equip_weapon(dummy_gun)
 
     return aliens, inventory
