@@ -1,5 +1,6 @@
 # from pgzero.game import screen  # game won't start with this import line
-# from dummy_enemies import *
+from pgzero.clock import clock
+
 from enemy_gen import spawn_dummy_enemies
 
 from gui.main_menu import MainMenu
@@ -25,6 +26,7 @@ cur_actor = None
 
 target_list = []
 
+scheduled = False
 
 def check_end():
     global party, enemies
@@ -169,27 +171,55 @@ def on_mouse_down(pos):
                     perform(everyone[cur_actor], target_list, everyone[cur_actor].skills[active_skill - 1])
                     check_end()
 
-        # 2) Handling the enemies' turns:
-        elif everyone[cur_actor] in enemies:
-            # TODO: to be replaced with the automated enemy attacks
-            if everyone[cur_actor].dead:
-                next_turn()
-                message = f"Now it's {everyone[cur_actor]}'s turn"
-                gui.info_panel.print(message)
-                check_end()
-            else:
-                target_list = [max(party, key=lambda x: x.hp)]  # AI will always choose a hero with max HP
-                # however, if some of the heroes activated the only_target skill, then AI chooses him:
-                for hero in party:
-                    if hero.only_target:
-                        target_list = [hero]
-                perform(everyone[cur_actor], target_list, everyone[cur_actor].skills[active_skill - 1])
-                check_end()
+        # 2) Handling enemies' turns - it happens inside the update() function using the clock()
 
     elif MODE == "result":
         if gui.next_btn.actor.collidepoint(pos):
             gui = PartyScreen(screen, PADDING, party, inv)
             MODE = "party"
+
+
+def enemy_turn_dead():
+    global everyone, cur_actor, gui
+    global scheduled
+    next_turn()
+    message = f"Now it's {everyone[cur_actor]}'s turn"
+    gui.info_panel.print(message)
+    check_end()
+    scheduled = False
+
+
+def enemy_turn_alive():
+    global everyone, cur_actor, party
+    global target_list, gui, active_skill
+    global scheduled
+    target_list = [max(party, key=lambda x: x.hp)]  # AI will always choose a hero with max HP
+    # however, if some of the heroes activated the only_target skill, then AI chooses him:
+    for hero in party:
+        if hero.only_target:
+            target_list = [hero]
+    perform(everyone[cur_actor], target_list, everyone[cur_actor].skills[active_skill - 1])
+    check_end()
+    scheduled = False
+
+
+def update():
+    global everyone, cur_actor
+    global gui, MODE
+    global target_list
+    global scheduled
+
+    # Automated enemy turns:
+    if MODE == "battle":
+        if everyone[cur_actor] in enemies:
+            if everyone[cur_actor].dead:
+                if not scheduled:
+                    clock.schedule(enemy_turn_dead, 1.5)
+                    scheduled = True
+            else:
+                if not scheduled:
+                    clock.schedule(enemy_turn_alive, 1.5)  # schedule_unique DOES NOT WORK, because it constantly postpones the execution
+                    scheduled = True
 
 
 def on_mouse_move(pos):
