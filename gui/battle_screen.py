@@ -302,8 +302,8 @@ class BattleScreen:
         self.skill_panel.update_all(char)
 
     def render(self):
-        self.skill_panel.render()
         self.info_panel.render()
         self.queue_panel.render()
         self.hero_panel.render()
         self.enemy_panel.render()
+        self.skill_panel.render()
