@@ -22,11 +22,17 @@ class Char:
         self.hp = self.max_hp()
         self.mp = self.max_mp()
         self.only_target = False  # TODO: how to unset this option?
+        self.stun = False
         self.dead = False
+
+    def remove_effects(self):
+        self.only_target = False
+        self.stun = False
 
     def kill(self):
         self.hp = 0
         self.dead = True
+        self.remove_effects()
         self.actor.image = f"{self.image_base}_duck"
 
     def revive(self):
@@ -51,8 +57,9 @@ class Char:
         sounds.eep.play()
 
     def funny_jump(self):
-        self.set_jump()
-        clock.schedule_unique(self.set_stand, 0.1)
+        if not self.dead:
+            self.set_jump()
+            clock.schedule_unique(self.set_stand, 0.1)
 
     def learn(self, *skills):
         for skill in skills:

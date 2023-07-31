@@ -51,6 +51,9 @@ def check_end():
 
 def next_turn():
     global cur_actor, everyone
+
+    everyone[cur_actor].remove_effects()
+    
     if cur_actor < (len(everyone) - 1):
         cur_actor += 1
     else:
@@ -158,8 +161,15 @@ def on_mouse_down(pos):
         # 1) Handling the player's turns:
         if everyone[cur_actor] in party:
             if everyone[cur_actor].dead:
+                dead_name = everyone[cur_actor].name
                 next_turn()
-                message = f"Now it's {everyone[cur_actor]}'s turn"
+                message = f"{dead_name} is dead. Now it's {everyone[cur_actor]}'s turn"
+                gui.info_panel.print(message)
+                check_end()
+            elif everyone[cur_actor].stun:
+                dead_name = everyone[cur_actor].name
+                next_turn()
+                message = f"{dead_name} is stunned. Now it's {everyone[cur_actor]}'s turn"
                 gui.info_panel.print(message)
                 check_end()
             else:
@@ -178,8 +188,20 @@ def on_mouse_down(pos):
 def enemy_turn_dead():
     global everyone, cur_actor, gui
     global scheduled
+    name = everyone[cur_actor].name
     next_turn()
-    message = f"Now it's {everyone[cur_actor]}'s turn"
+    message = f"{name} is dead. Now it's {everyone[cur_actor]}'s turn"
+    gui.info_panel.print(message)
+    check_end()
+    scheduled = False
+
+
+def enemy_turn_stun():
+    global everyone, cur_actor, gui
+    global scheduled
+    name = everyone[cur_actor].name
+    next_turn()
+    message = f"{name} is stunned and misses a turn. Now it's {everyone[cur_actor]}'s turn"
     gui.info_panel.print(message)
     check_end()
     scheduled = False
@@ -211,6 +233,10 @@ def update():
             if everyone[cur_actor].dead:
                 if not scheduled:
                     clock.schedule(enemy_turn_dead, 1.5)
+                    scheduled = True
+            elif everyone[cur_actor].stun:
+                if not scheduled:
+                    clock.schedule(enemy_turn_stun, 1.5)
                     scheduled = True
             else:
                 if not scheduled:

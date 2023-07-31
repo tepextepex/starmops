@@ -11,7 +11,7 @@ def init_game():
     Jeb = Char("Jebediah", "alien_blue",
                 "Jebediah is a jebedi knight. Wily and agile, he prefers melee combat using lasersabers",
                3, 10, 7, 5)
-    Jeb.learn(melee_attack, ranged_attack, swing)
+    Jeb.learn(melee_attack, ranged_attack, swing, stun)
 
     Scar = Char("Scarface", "alien_pink",
                 "Scarface is always smiling, but don't fall for this. He is fierce and adores to dismember his opponents",
