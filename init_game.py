@@ -6,12 +6,12 @@ def init_game():
     Hodor = Char("Hodor", "alien_green",
                  "Hodor is the tank. THE tank. He is a tough guy who defends his dudes",
                  7, 3, 10, 5)
-    Hodor.learn(melee_attack, ranged_attack, hold)
+    Hodor.learn(melee_attack, ranged_attack, hold, band_aid)
 
     Jeb = Char("Jebediah", "alien_blue",
                 "Jebediah is a jebedi knight. Wily and agile, he prefers melee combat using lasersabers",
                3, 10, 7, 5)
-    Jeb.learn(melee_attack, ranged_attack, swing, stun)
+    Jeb.learn(melee_attack, ranged_attack, swing, stun, mana_steal)
 
     Scar = Char("Scarface", "alien_pink",
                 "Scarface is always smiling, but don't fall for this. He is fierce and adores to dismember his opponents",
@@ -21,12 +21,12 @@ def init_game():
     East = Char("Eastwood", "alien_yellow",
                   "A gunslinger without a name. Everybody calls him Eastwood but we have no idea why",
                 3, 10, 5, 7)
-    East.learn(melee_attack, ranged_attack, piercing_shot)
+    East.learn(melee_attack, ranged_attack, piercing_shot, nuke)
 
     Pope = Char("Pope", "alien_beige",
                  "Pope is a master spellcaster. He has an essential ability to heal his allies",
                 3, 5, 7, 10)
-    Pope.learn(melee_attack, ranged_attack, heal, revive)
+    Pope.learn(melee_attack, ranged_attack, heal, revive, holy_grenade)
 
     aliens = (Hodor, Jeb, Scar, East, Pope)
 

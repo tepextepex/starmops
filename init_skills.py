@@ -11,6 +11,11 @@ def decrease_hp(value, *targets):
         target.hp = target.hp - value if target.hp - value > 0 else 0
 
 
+def steal_mp(value, *targets):
+    for target in targets:
+        target.mp = 1
+
+
 def only_target(value, *targets):
     for target in targets:
         target.only_target = True
@@ -38,8 +43,20 @@ swing = Attack("Blood harvest", "Attacks the entire row",
 stun = Attack("Confuse", "Jebedi force makes the enemy skip a turn",
               "confuse", "single", True, "INT", 30, stun_char)
 
+mana_steal = Attack("Steal the force", "Drains the target's MP completely",
+              "low_battery", "single", True, "INT", 30, steal_mp)
+
 piercing_shot = Attack("Piercing shot", "Attacks two targets at the same time",
                        "bullet", "column", True, "DEX", 50, decrease_hp)
+
+nuke = Attack("Nuke", "Attacks all the enemies. Evaporate 'em all!",
+              "nuke", "area", True, "DEX", 50, decrease_hp)
+
+holy_grenade = Attack("Holy granade", "Pope's taken a bunch of these on a planet inhabited by antropomorphic worms",
+                      "orb", "row", True, "INT", 40, decrease_hp)
+
+band_aid = Buff("Heal", "Increases HP but just a little bit",
+            "band", "single", 20, increase_hp)
 
 heal = Buff("Heal", "Increases HP of one of your allies",
             "heart", "single", 30, increase_hp)

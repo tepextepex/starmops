@@ -53,7 +53,7 @@ def next_turn():
     global cur_actor, everyone
 
     everyone[cur_actor].remove_effects()
-    
+
     if cur_actor < (len(everyone) - 1):
         cur_actor += 1
     else:
@@ -293,6 +293,10 @@ def on_mouse_move(pos):
                     else:  # if s.no in (3, 6):
                         highlight = (3, 6)
                         target_list = [panel.slots[2].hero, panel.slots[5].hero]
+                elif aim == "area":
+                    highlight = (1, 2, 3, 4, 5, 6)
+                    target_list = [panel.slots[0].hero, panel.slots[1].hero, panel.slots[2].hero,
+                                   panel.slots[3].hero, panel.slots[4].hero, panel.slots[5].hero]
 
                 for s in panel.slots:
                     if s.no in highlight:
