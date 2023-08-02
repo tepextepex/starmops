@@ -12,6 +12,8 @@ from gui.result_screen import ResultScreen
 from config import *
 from init_game import init_game
 
+from classes import Potion
+
 MODE = "menu"
 gui = MainMenu(WIDTH, HEIGHT)
 
@@ -27,6 +29,7 @@ cur_actor = None
 target_list = []
 
 scheduled = False
+drag = None
 
 
 def check_end():
@@ -101,6 +104,8 @@ def on_mouse_down(pos):
     global MODE, gui
     global active_skill, cur_actor
     global target_list
+    global drag
+    global inv
 
     if MODE == "menu":
         if gui.menu_start.collidepoint(pos):
@@ -137,8 +142,26 @@ def on_mouse_down(pos):
     elif MODE == "party":
         for hero in party:
             if hero.actor.collidepoint(pos):
-                print(hero)
                 hero.funny_jump()
+
+        # drag'n'drop for items:
+        if drag is None:  # first click
+            for s in gui.inv_panel.slots:
+                if s.box.box.collidepoint(pos):
+                    drag = (s.item, s.item.actor.center)
+        else:  # second click
+            item = drag[0]
+            for hero in party:
+                if isinstance(item, Potion):  # potions should be collided with heroes themselves
+                    if hero.actor.collidepoint(pos):
+                        item.apply(hero)  # applying the effects of potion to the selected hero
+                        inv.remove(item)  # removing the used item from inventory
+                        gui.inv_panel.update(inv)  # updating gui
+                else:
+                    pass
+            else:
+                item.actor.center = drag[1]  # just returning the item on its place in inventory
+            drag = None
 
         if gui.next_btn.actor.collidepoint(pos):
             print("Going into battle")
@@ -248,6 +271,7 @@ def on_mouse_move(pos):
     global active_skill, cur_actor
     global gui
     global everyone, target_list
+    global drag
     if MODE == "party":
         # checking collisions with the inventory slots to show pop-ups with item descriptions:
         for s in gui.inv_panel.slots:
@@ -256,6 +280,10 @@ def on_mouse_move(pos):
                     s.open_popup(pos)
             else:
                 s.close_popup()
+
+        # drag'n'drop for items:
+        if drag is not None:
+            drag[0].actor.center = pos
 
     elif MODE == "battle":
         if everyone[cur_actor] in party:  # highlight works only during the player's turn

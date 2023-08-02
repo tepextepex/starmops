@@ -138,25 +138,48 @@ class InvSlot:
 class InventoryPanel:
     def __init__(self, screen, padding, x, y, width, height, inventory):
         self.box = Panel(screen, padding, x, y, width, height, False)
+        self.x = x
+        self.y = y
+        self.screen = screen
+        self.padding = padding
         self.slots = []
 
-        cols, rows = 10, 3
-        slot_width = (width - (cols + 1) * padding) / cols
+        self.cols, self.rows = 10, 3
+        self.slot_width = (width - (self.cols + 1) * self.padding) / self.cols
         # slot_height = (height - (rows + 1) * padding) / rows
-        slot_height = slot_width
+        self.slot_height = self.slot_width
         # print(slot_height)  # 51 px
 
+        self.update(inventory)
+        """
         # filtering out the items which are already equipped:
         inventory = [x for x in inventory if x.equipped is None]
 
         item_no = 0
-        for row in range(rows):
-            slot_y = y + padding + row * (padding + slot_height)
-            for col in range(cols):
-                slot_x = x + padding + col * (padding + slot_width)
+        for row in range(self.rows):
+            slot_y = self.y + self.padding + row * (self.padding + self.slot_height)
+            for col in range(self.cols):
+                slot_x = self.x + self.padding + col * (self.padding + self.slot_width)
                 item = inventory[item_no] if item_no < len(inventory) else None
-                # if item is not None:
-                self.slots.append(InvSlot(screen, padding, slot_x, slot_y, slot_width, slot_height, item))
+
+                self.slots.append(InvSlot(self.screen, self.padding, slot_x, slot_y, 
+                                          self.slot_width, self.slot_height, item))
+                item_no += 1
+        """
+
+    def update(self, inventory):
+        self.slots = []
+        # filtering out the items which are already equipped:
+        inventory = [x for x in inventory if x.equipped is None]
+        item_no = 0
+        for row in range(self.rows):
+            slot_y = self.y + self.padding + row * (self.padding + self.slot_height)
+            for col in range(self.cols):
+                slot_x = self.x + self.padding + col * (self.padding + self.slot_width)
+                item = inventory[item_no] if item_no < len(inventory) else None
+
+                self.slots.append(InvSlot(self.screen, self.padding, slot_x, slot_y,
+                                          self.slot_width, self.slot_height, item))
                 item_no += 1
 
     def render(self):
