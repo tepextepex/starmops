@@ -1,5 +1,6 @@
 from init_skills import *
 from classes import Char, Weapon, Armor
+from classes import HealingPotion, LesserCider, GreaterCider, RevivalPotion
 
 
 def init_game():
@@ -35,9 +36,10 @@ def init_game():
     dummy_saw = Weapon("melee", "Rusty chainsaw", "chainsaw", 15)
     dummy_saber = Weapon("melee", "Rusty lasersaber", "lasersaber", 15)
     dummy_shield = Armor("dummy", "Wooden shield", "shield_bronze", 5)
-    dummy_umbrella = Armor("dummy", "Umbrella", "umbrella_open", 2)
 
-    inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_shield, dummy_umbrella]
+    inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_shield,
+                 HealingPotion(), HealingPotion(), RevivalPotion(),
+                 LesserCider(), LesserCider(), GreaterCider()]
 
     Hodor.equip_weapon(dummy_sword)
     Jeb.equip_weapon(dummy_saber)
