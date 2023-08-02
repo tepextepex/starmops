@@ -85,6 +85,7 @@ class Weapon:
         self.actor = Actor(image)
         self.attack = attack
         self.equipped = None
+        self.description = None
 
 
 class Armor:
@@ -95,6 +96,7 @@ class Armor:
         self.actor = Actor(image)
         self.defence = defence
         self.equipped = None
+        self.description = None
 
 
 class Potion:

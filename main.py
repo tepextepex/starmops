@@ -248,7 +248,16 @@ def on_mouse_move(pos):
     global active_skill, cur_actor
     global gui
     global everyone, target_list
-    if MODE == "battle":
+    if MODE == "party":
+        # checking collisions with the inventory slots to show pop-ups with item descriptions:
+        for s in gui.inv_panel.slots:
+            if s.box.box.collidepoint(pos):
+                if s.item is not None:
+                    s.open_popup(pos)
+            else:
+                s.close_popup()
+
+    elif MODE == "battle":
         if everyone[cur_actor] in party:  # highlight works only during the player's turn
             # TODO: check what skill is active now (melee|ranged & aim-mode)
             target = everyone[cur_actor].skills[active_skill - 1].target
