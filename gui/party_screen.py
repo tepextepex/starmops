@@ -26,7 +26,7 @@ class HorBar:
 
     def render(self):
         self.screen.draw.filled_rect(self.box, self.color)
-        self.screen.draw.text(f"{self.value}/{self.max_value}",
+        self.screen.draw.text(f"{round(self.value)}/{self.max_value}",
                               midtop=(self.left + self.width / 2, self.top),
                               width=self.width,
                               fontsize=18)
