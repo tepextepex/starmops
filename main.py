@@ -144,7 +144,7 @@ def on_mouse_down(pos):
             if hero.actor.collidepoint(pos):
                 hero.funny_jump()
 
-        # drag'n'drop for items:
+        # TODO: drag'n'drop for items:
         if drag is None:  # first click
             for s in gui.inv_panel.slots:
                 if s.box.box.collidepoint(pos):
@@ -156,7 +156,7 @@ def on_mouse_down(pos):
                     if hero.actor.collidepoint(pos):
                         item.apply(hero)  # applying the effects of potion to the selected hero
                         inv.remove(item)  # removing the used item from inventory
-                        gui.inv_panel.update(inv)  # updating gui
+                        gui.update(inv)  # updating gui
                 else:
                     pass
             else:

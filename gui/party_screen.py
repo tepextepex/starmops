@@ -43,21 +43,26 @@ class HeroPanel:
         self.hero = hero
         self.box = Panel(screen, padding, x, y, width, height, False)
         self.actor = hero.actor
-        hero_mid_y = self.y + padding + 90
-        self.actor.midbottom = (self.x + self.width / 2, hero_mid_y)
+        self.hero_mid_y = self.y + padding + 90
+        self.actor.midbottom = (self.x + self.width / 2, self.hero_mid_y)
         self.bars = []
-        self.bars.append(
-            HorBar(screen, x + 10, hero_mid_y + 25, 12, self.width - 20, self.hero.hp, self.hero.max_hp(), c_red))
-        self.bars.append(
-            HorBar(screen, x + 10, hero_mid_y + 40, 12, self.width - 20, self.hero.mp, self.hero.max_mp(), c_blue))
+
+        self.update()
 
         equip_slot_size = 51
         self.weapon_slot = EquipSlot(self.screen, self.padding,
-                                   self.x + padding, hero_mid_y - equip_slot_size,
+                                   self.x + padding, self.hero_mid_y - equip_slot_size,
                                    equip_slot_size, equip_slot_size, self.hero.weapon)
         self.armor_slot = EquipSlot(self.screen, self.padding,
-                                  self.x + self.width - equip_slot_size - padding, hero_mid_y - equip_slot_size,
+                                  self.x + self.width - equip_slot_size - padding, self.hero_mid_y - equip_slot_size,
                                   equip_slot_size, equip_slot_size, self.hero.armor)
+
+    def update(self):
+        self.bars = []
+        self.bars.append(
+            HorBar(self.screen, self.x + 10, self.hero_mid_y + 25, 12, self.width - 20, self.hero.hp, self.hero.max_hp(), c_red))
+        self.bars.append(
+            HorBar(self.screen, self.x + 10, self.hero_mid_y + 40, 12, self.width - 20, self.hero.mp, self.hero.max_mp(), c_blue))
 
     def render(self):
         self.box.render()
@@ -149,23 +154,7 @@ class InventoryPanel:
         # slot_height = (height - (rows + 1) * padding) / rows
         self.slot_height = self.slot_width
         # print(slot_height)  # 51 px
-
         self.update(inventory)
-        """
-        # filtering out the items which are already equipped:
-        inventory = [x for x in inventory if x.equipped is None]
-
-        item_no = 0
-        for row in range(self.rows):
-            slot_y = self.y + self.padding + row * (self.padding + self.slot_height)
-            for col in range(self.cols):
-                slot_x = self.x + self.padding + col * (self.padding + self.slot_width)
-                item = inventory[item_no] if item_no < len(inventory) else None
-
-                self.slots.append(InvSlot(self.screen, self.padding, slot_x, slot_y, 
-                                          self.slot_width, self.slot_height, item))
-                item_no += 1
-        """
 
     def update(self, inventory):
         self.slots = []
@@ -210,3 +199,8 @@ class PartyScreen:
             p.render()
         self.inv_panel.render()
         self.next_btn.render()
+
+    def update(self, inventory):
+        self.inv_panel.update(inventory)
+        for p in self.hero_panels:
+            p.update()
