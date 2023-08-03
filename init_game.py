@@ -31,10 +31,10 @@ def init_game():
 
     aliens = (Hodor, Jeb, Scar, East, Pope)
 
-    dummy_gun = Weapon("ranged", "Ray gun", "blaster", 10)
-    dummy_sword = Weapon("melee", "Rusty sword", "sword_bronze", 15)
-    dummy_saw = Weapon("melee", "Rusty chainsaw", "chainsaw", 15)
-    dummy_saber = Weapon("melee", "Rusty lasersaber", "lasersaber", 15)
+    dummy_gun = Weapon("ranged", "Ray gun", "piu piu!", "blaster", 10)
+    dummy_sword = Weapon("melee", "Rusty sword", "Uses STR for melee attacks", "sword_bronze", 15)
+    dummy_saw = Weapon("melee", "Rusty chainsaw", "Uses STR for melee attacks", "chainsaw", 15)
+    dummy_saber = Weapon("melee", "Rusty lasersaber", "Uses DEX for melee attacks. Very useful for Jeb", "lasersaber", 15)
     dummy_shield = Armor("dummy", "Wooden shield", "shield_bronze", 5)
 
     inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_shield,

@@ -91,14 +91,38 @@ class HeroPanel:
 class EquipSlot:
     def __init__(self, screen, padding, x, y, width, height, item):
         self.box = Panel(screen, padding, x, y, width, height, False)
+        self.screen = screen
+        self.padding = padding
         self.item = item
+        self.popup = None
         if self.item is not None:
                 item.actor.center = (x + width / 2, y + height / 2)
+
+    def open_popup(self, pos):
+        self.popup = pos
+
+    def close_popup(self):
+        self.popup = None
 
     def render(self):
         self.box.render()
         if self.item is not None:
             self.item.actor.draw()
+            if self.popup:
+                p_size = 120
+                x, y = self.popup
+                # y -= p_size
+                popup_background = Rect((x, y), (p_size, p_size))
+                self.screen.draw.filled_rect(popup_background, c_white)
+                self.screen.draw.text(self.item.name,
+                                      midtop=(x + p_size / 2, y + self.padding),
+                                      width=p_size - 2 * self.padding,
+                                      fontsize=20, color=(20, 20, 20))
+                if self.item.description is not None:
+                    self.screen.draw.text(self.item.description,
+                                          midtop=(x + p_size / 2, y + self.padding + 35),
+                                          width=p_size - 2 * self.padding,
+                                          fontsize=20, color=(40, 40, 40))
 
 
 class InvSlot:

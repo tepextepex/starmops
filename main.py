@@ -281,6 +281,13 @@ def on_mouse_move(pos):
             else:
                 s.close_popup()
 
+        for s in gui.hero_panels:
+            if s.weapon_slot.box.box.collidepoint(pos):
+                if s.weapon_slot.item is not None:
+                    s.weapon_slot.open_popup(pos)
+            else:
+                s.weapon_slot.close_popup()
+
         # drag'n'drop for items:
         if drag is not None:
             drag[0].actor.center = pos
