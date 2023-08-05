@@ -13,6 +13,7 @@ from config import *
 from init_game import init_game
 
 from classes import Potion
+from classes import Chainsaw, LaserSaber, RayGun, MagicWand
 
 MODE = "menu"
 gui = MainMenu(WIDTH, HEIGHT)
@@ -68,6 +69,29 @@ def calc_damage(stat_value, weapon_dmg):
     return value
 
 
+def calc_coef(skill, author):
+    if skill.name == "Melee attack":
+        if isinstance(author.weapon, Chainsaw):  # Chainsaw, LaserSaber, RayGun, MagicWand
+            coef = author.str
+        elif isinstance(author.weapon, LaserSaber):
+            coef = author.dex
+        elif isinstance(author.weapon, RayGun):
+            coef = author.dex
+        elif isinstance(author.weapon, MagicWand):
+            coef = author.int
+        else:
+            coef = author.str
+    else:
+        if skill.uses == "STR":
+            coef = author.str
+        elif skill.uses == "DEX":
+            coef = author.dex
+        elif skill.uses == "INT":
+            coef = author.int
+
+    return coef
+
+
 def perform(author, targets, skill):
     global cur_actor, active_skill, everyone
     global gui
@@ -77,15 +101,11 @@ def perform(author, targets, skill):
 
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
-        # TODO: compute "stat_value" based on weapon stats for melee attacks
-        if skill.uses == "STR":
-            stat_value = author.str
-        elif skill.uses == "DEX":
-            stat_value = author.dex
-        elif skill.uses == "INT":
-            stat_value = author.int
+
+        coef = calc_coef(skill, author)
         weapon_dmg = author.weapon.dmg if author.weapon is not None else 10
-        dmg = calc_damage(stat_value, weapon_dmg)
+
+        dmg = calc_damage(coef, weapon_dmg)
         print(f"Skill effect: {dmg}")  # DEBUG
         skill.affect_target(dmg, *targets)
 
