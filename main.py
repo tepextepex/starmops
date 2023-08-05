@@ -86,6 +86,7 @@ def perform(author, targets, skill):
             stat_value = author.int
         weapon_dmg = author.weapon.dmg if author.weapon is not None else 10
         dmg = calc_damage(stat_value, weapon_dmg)
+        print(f"Skill effect: {dmg}")  # DEBUG
         skill.affect_target(dmg, *targets)
 
         active_skill = 1

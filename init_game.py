@@ -1,6 +1,5 @@
 from init_skills import *
-from classes import Char, Weapon, Armor
-from classes import HealingPotion, LesserCider, GreaterCider, RevivalPotion
+from classes import *
 
 
 def init_game():
@@ -31,13 +30,15 @@ def init_game():
 
     aliens = (Hodor, Jeb, Scar, East, Pope)
 
-    dummy_gun = Weapon("ranged", "Ray gun", "piu piu!", "blaster", 10)
-    dummy_sword = Weapon("melee", "Rusty sword", "Uses STR for melee attacks", "sword_bronze", 15)
-    dummy_saw = Weapon("melee", "Rusty chainsaw", "Uses STR for melee attacks", "chainsaw", 15)
-    dummy_saber = Weapon("melee", "Rusty lasersaber", "Uses DEX for melee attacks. Very useful for Jeb", "lasersaber", 15)
     dummy_shield = Armor("dummy", "Wooden shield", "shield_bronze", 5)
 
-    inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_shield,
+    dummy_gun = RayGun()
+    dummy_saw = Chainsaw()
+    dummy_sword = Chainsaw()
+    dummy_saber = LaserSaber()
+    dummy_wand = MagicWand()
+
+    inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_wand, dummy_shield,
                  HealingPotion(), HealingPotion(), RevivalPotion(),
                  LesserCider(), LesserCider(), GreaterCider()]
 
@@ -45,5 +46,6 @@ def init_game():
     Jeb.equip_weapon(dummy_saber)
     Scar.equip_weapon(dummy_saw)
     East.equip_weapon(dummy_gun)
+    Pope.equip_weapon(dummy_wand)
 
     return aliens, inventory
