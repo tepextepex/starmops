@@ -82,16 +82,25 @@ class Char:
 class Weapon:
     def __init__(self, type, name, description, image, dmg, tier=0):
         self.type = type
-        self.name = name
+        self.tier = tier
+        # self.name = name
+        self.name = f"{self.name_prefix()} {name}"
         self.description = description
         self.image = image
         self.actor = Actor(image)
-        self.tier = tier
         if self.tier is None:
             self.dmg = dmg
         else:
             self.dmg = self.random_damage()
         self.equipped = None
+
+    def name_prefix(self):
+        line_no = self.tier if self.tier <= 39 else 39
+        with open("random/xbzht") as fp:
+            for i, line in enumerate(fp):
+                if i == line_no:
+                    print(line.rstrip())
+                    return line.rstrip()  # eliminates all the trailing whitespaces including newline chars
 
     def random_damage(self):
         min_dmg = 10 + self.tier * 3
