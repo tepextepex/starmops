@@ -63,6 +63,11 @@ def next_turn():
         cur_actor = 0
 
 
+def calc_damage(stat_value, weapon_dmg):
+    value = stat_value * weapon_dmg / 4
+    return value
+
+
 def perform(author, targets, skill):
     global cur_actor, active_skill, everyone
     global gui
@@ -72,8 +77,16 @@ def perform(author, targets, skill):
 
     if author.mp >= skill.mp_cost:
         author.mp -= skill.mp_cost
-        # TODO: compute "value" based on hero stats and current weapon
-        skill.affect_target(30, *targets)
+        # TODO: compute "stat_value" based on weapon stats for melee attacks
+        if skill.uses == "STR":
+            stat_value = author.str
+        elif skill.uses == "DEX":
+            stat_value = author.dex
+        elif skill.uses == "INT":
+            stat_value = author.int
+        weapon_dmg = author.weapon.dmg if author.weapon is not None else 10
+        dmg = calc_damage(stat_value, weapon_dmg)
+        skill.affect_target(dmg, *targets)
 
         active_skill = 1
         gui.skill_panel.set_active_skill(1)

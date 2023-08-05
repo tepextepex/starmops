@@ -78,13 +78,13 @@ class Char:
 
 
 class Weapon:
-    def __init__(self, type, name, description, image, attack):
+    def __init__(self, type, name, description, image, dmg):
         self.type = type
         self.name = name
         self.description = description
         self.image = image
         self.actor = Actor(image)
-        self.attack = attack
+        self.dmg = dmg
         self.equipped = None
 
 
