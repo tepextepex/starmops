@@ -2,6 +2,8 @@ from pygame import Rect
 
 from gui.base import c_red, c_blue, c_white, Panel, NextBtn
 
+from classes import *
+
 
 ########################################
 ### GUI panels for the party screen  ###
@@ -72,20 +74,20 @@ class HeroPanel:
         for bar in self.bars:
             bar.render()
 
-        # slots with the equipped weapon and armor:
-        self.weapon_slot.render()
-        self.armor_slot.render()
-
-        # column 1
+        # hero stats, column 1
         self.screen.draw.text(f"STR {self.hero.str}",
                               midtop=(self.x + self.width / 4, self.y + 125 + 4 * self.padding))
         self.screen.draw.text(f"DEX {self.hero.dex}",
                               midtop=(self.x + self.width / 4, self.y + 120 + 7 * self.padding))
-        # column 2
+        # hero stats, column 2
         self.screen.draw.text(f"CON {self.hero.con}",
                               midtop=(self.x + 3 * self.width / 4, self.y + 125 + 4 * self.padding))
         self.screen.draw.text(f"INT {self.hero.int}",
                               midtop=(self.x + 3 * self.width / 4, self.y + 120 + 7 * self.padding))
+
+        # slots with the equipped weapon and armor:
+        self.weapon_slot.render()
+        self.armor_slot.render()
 
 
 class EquipSlot:
@@ -119,7 +121,10 @@ class EquipSlot:
                                       width=p_size - 2 * self.padding,
                                       fontsize=20, color=(20, 20, 20))
                 if self.item.description is not None:
-                    self.screen.draw.text(self.item.description,
+                    desc_text = self.item.description
+                    if isinstance(self.item, Weapon):
+                        desc_text += f"\n \nBase DMG: {self.item.dmg}"
+                    self.screen.draw.text(desc_text,
                                           midtop=(x + p_size / 2, y + self.padding + 35),
                                           width=p_size - 2 * self.padding,
                                           fontsize=20, color=(40, 40, 40))
@@ -158,7 +163,10 @@ class InvSlot:
                                           width=p_size - 2 * self.padding,
                                           fontsize=20, color=(20, 20, 20))
                     if self.item.description is not None:
-                        self.screen.draw.text(self.item.description,
+                        desc_text = self.item.description
+                        if isinstance(self.item, Weapon):
+                            desc_text += f"\n \nBase DMG: {self.item.dmg}"
+                        self.screen.draw.text(desc_text,
                                               midtop=(x + p_size / 2, y + self.padding + 20),
                                               width=p_size - 2 * self.padding,
                                               fontsize=20, color=(40, 40, 40))
