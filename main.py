@@ -17,6 +17,9 @@ from potion import Potion
 from weapon import Weapon, Chainsaw, LaserSaber, RayGun, MagicWand
 
 MODE = "menu"
+
+TIER = 0
+
 gui = MainMenu(WIDTH, HEIGHT)
 
 aliens, inv = init_game()
@@ -36,14 +39,15 @@ drag = None
 
 def check_end():
     global party, enemies
-    global MODE, gui
+    global MODE, gui, inv
     all_dead = True
     for hero in party:
         if hero.dead is not True:
             all_dead = False
     if all_dead:
         MODE = "result"
-        gui = ResultScreen(screen, PADDING, False)
+        gui = ResultScreen(screen, PADDING, False, TIER)
+        inv += gui.loot.copy()
 
     all_dead = True
     for enemy in enemies:
@@ -51,7 +55,8 @@ def check_end():
             all_dead = False
     if all_dead:
         MODE = "result"
-        gui = ResultScreen(screen, PADDING, True)
+        gui = ResultScreen(screen, PADDING, True, TIER)
+        inv += gui.loot.copy()
 
 
 def next_turn():

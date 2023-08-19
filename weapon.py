@@ -1,6 +1,12 @@
-from random import seed, choices
+from random import seed, choices, choice
 
 from pgzero.actor import Actor
+
+
+def gen_weapon(tier=0):
+    w = [Chainsaw(tier=tier), LaserSaber(tier=tier), RayGun(tier=tier), MagicWand(tier=tier)]
+    seed()
+    return choice(w)
 
 
 class Weapon:
