@@ -38,9 +38,11 @@ def init_game():
     dummy_saber = LaserSaber()
     dummy_wand = MagicWand()
 
+    spare_wand = MagicWand()  # DEBUG
+
     inventory = [dummy_gun, dummy_sword, dummy_saber, dummy_saw, dummy_wand, dummy_shield,
                  HealingPotion(), HealingPotion(), RevivalPotion(),
-                 LesserCider(), LesserCider(), GreaterCider()]
+                 LesserCider(), LesserCider(), GreaterCider(), spare_wand]
 
     Hodor.equip_weapon(dummy_sword)
     Jeb.equip_weapon(dummy_saber)

@@ -12,7 +12,7 @@ from gui.result_screen import ResultScreen
 from config import *
 from init_game import init_game
 
-from classes import Potion
+from classes import Potion, Weapon, Armor
 from classes import Chainsaw, LaserSaber, RayGun, MagicWand
 
 MODE = "menu"
@@ -182,19 +182,46 @@ def on_mouse_down(pos):
         if drag is None:  # first click
             for s in gui.inv_panel.slots:
                 if s.box.box.collidepoint(pos):
-                    drag = (s.item, s.item.actor.center)
+                    if s.item is not None:
+                        drag = (s.item, s.item.actor.center)
         else:  # second click
             item = drag[0]
-            for hero in party:
-                if isinstance(item, Potion):  # potions should be collided with heroes themselves
+            if isinstance(item, Potion):  # potions should be collided with heroes themselves
+                for hero in party:
                     if hero.actor.collidepoint(pos):
                         item.apply(hero)  # applying the effects of potion to the selected hero
                         inv.remove(item)  # removing the used item from inventory
                         gui.update(inv)  # updating gui
+                        break  # goes to the else statement
                 else:
-                    pass
-            else:
-                item.actor.center = drag[1]  # just returning the item on its place in inventory
+                    item.actor.center = drag[1]  # just returning the item on its place in inventory
+
+            elif isinstance(item, Weapon):  # weapons should be collided with the slots to the left from hero
+                for panel in gui.hero_panels:
+                    if panel.weapon_slot.box.box.collidepoint(pos):
+                        if panel.weapon_slot.item is not None:
+                            panel.weapon_slot.item.equipped = None
+                        panel.weapon_slot.item = item
+                        panel.weapon_slot.center_actor()
+                        panel.hero.equip_weapon(item)
+                        gui.update(inv)  # updating gui
+                        break
+                else:
+                    item.actor.center = drag[1]  # just returning the item on its place in inventory
+
+            elif isinstance(item, Armor):
+                for panel in gui.hero_panels:
+                    if panel.armor_slot.box.box.collidepoint(pos):
+                        if panel.armor_slot.item is not None:
+                            panel.armor_slot.item.equipped = None
+                        panel.armor_slot.item = item
+                        panel.armor_slot.center_actor()
+                        panel.hero.equip_armor(item)
+                        gui.update(inv)  # updating gui
+                        break
+                else:
+                    item.actor.center = drag[1]  # just returning the item on its place in inventory
+
             drag = None
 
         if gui.next_btn.actor.collidepoint(pos):

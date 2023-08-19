@@ -54,10 +54,10 @@ class HeroPanel:
         equip_slot_size = 51
         self.weapon_slot = EquipSlot(self.screen, self.padding,
                                    self.x + padding, self.hero_mid_y - equip_slot_size,
-                                   equip_slot_size, equip_slot_size, self.hero.weapon)
+                                   equip_slot_size, equip_slot_size, self.hero.weapon, self.hero)
         self.armor_slot = EquipSlot(self.screen, self.padding,
                                   self.x + self.width - equip_slot_size - padding, self.hero_mid_y - equip_slot_size,
-                                  equip_slot_size, equip_slot_size, self.hero.armor)
+                                  equip_slot_size, equip_slot_size, self.hero.armor, self.hero)
 
     def update(self):
         self.bars = []
@@ -91,8 +91,13 @@ class HeroPanel:
 
 
 class EquipSlot:
-    def __init__(self, screen, padding, x, y, width, height, item):
+    def __init__(self, screen, padding, x, y, width, height, item, hero):
+        self.hero = hero
         self.box = Panel(screen, padding, x, y, width, height, False)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
         self.screen = screen
         self.padding = padding
         self.item = item
@@ -105,6 +110,9 @@ class EquipSlot:
 
     def close_popup(self):
         self.popup = None
+
+    def center_actor(self):
+        self.item.actor.center = (self.x + self.width / 2, self.y + self.height / 2)
 
     def render(self):
         self.box.render()
