@@ -1,5 +1,8 @@
+from armor import Armor
 from init_skills import *
 from classes import *
+from potion import HealingPotion, LesserCider, GreaterCider, RevivalPotion
+from weapon import Chainsaw, LaserSaber, RayGun, MagicWand
 
 
 def init_game():

@@ -2,7 +2,7 @@ from pygame import Rect
 
 from gui.base import c_red, c_blue, c_white, Panel, NextBtn
 
-from classes import *
+from weapon import Weapon
 
 
 ########################################

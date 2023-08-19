@@ -12,8 +12,9 @@ from gui.result_screen import ResultScreen
 from config import *
 from init_game import init_game
 
-from classes import Potion, Weapon, Armor
-from classes import Chainsaw, LaserSaber, RayGun, MagicWand
+from armor import Armor
+from potion import Potion
+from weapon import Weapon, Chainsaw, LaserSaber, RayGun, MagicWand
 
 MODE = "menu"
 gui = MainMenu(WIDTH, HEIGHT)
