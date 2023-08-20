@@ -1,3 +1,5 @@
+from pgzero.actor import Actor
+
 WIDTH = 640
 HEIGHT = 480
 PADDING = 10
