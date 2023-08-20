@@ -60,7 +60,7 @@ def check_end():
 
 
 def next_turn():
-    global cur_actor, everyone
+    global cur_actor, everyone, gui
 
     everyone[cur_actor].remove_effects()
 
@@ -68,6 +68,9 @@ def next_turn():
         cur_actor += 1
     else:
         cur_actor = 0
+
+    gui.highlight(everyone[cur_actor])
+    gui.update_skill_panel(everyone[cur_actor])
 
 
 def calc_damage(stat_value, weapon_dmg):
@@ -120,8 +123,8 @@ def perform(author, targets, skill):
 
         next_turn()
 
-        gui.highlight(everyone[cur_actor])
-        gui.update_skill_panel(everyone[cur_actor])
+        # gui.highlight(everyone[cur_actor])
+        # gui.update_skill_panel(everyone[cur_actor])
 
         message = f"{author} targets {targets} using {skill}. Now it's {everyone[cur_actor]}'s turn"
     else:

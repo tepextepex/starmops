@@ -29,7 +29,7 @@ class Weapon:
         with open("random/xbzht") as fp:
             for i, line in enumerate(fp):
                 if i == line_no:
-                    print(line.rstrip())
+                    # print(line.rstrip())
                     return line.rstrip()  # eliminates all the trailing whitespaces including newline chars
 
     def random_damage(self):
