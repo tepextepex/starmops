@@ -1,6 +1,7 @@
+import pygame
 from pygame import Rect
 
-from gui.base import c_red, c_blue, c_white, Panel
+from gui.base import c_red, c_blue, c_white, c_green, Panel
 
 
 ########################################
@@ -120,28 +121,40 @@ class InfoPanel(Panel):
 
 
 class QueuePanel(Panel):
-    def __init__(self, screen, padding, width, skills_panel_height, info_panel_height, party):
-        x = padding
-        y = padding
-        w = width
-        h = screen.height - (4 * padding + skills_panel_height + info_panel_height)
+    def __init__(self, screen, padding, width, skills_panel_height, info_panel_height, party, active_char):
+        self.padding = padding
+        self.x = padding
+        self.y = padding
+        self.w = width
+        self.h = screen.height - (4 * padding + skills_panel_height + info_panel_height)
         self.party = party
-        # print(f"Hi dear I am the Queue Panel, my height is {h} px")
-        Panel.__init__(self, screen, padding, x, y, w, h)
+        Panel.__init__(self, screen, padding, self.x, self.y, self.w, self.h)
         self.badge_size = 32
-        self.padding = 3  # MAGIC NUMBER
+        self.v_int = 3  # MAGIC NUMBER
+        self.cur_actor = active_char
+
+    def update(self, active_char):
+        self.cur_actor = active_char
 
     def render(self):
         Panel.render(self)
         for i, hero in enumerate(self.party):
             hero_x = self.x + self.padding
-            hero_y = self.y + self.padding + i * (self.padding + self.badge_size)
-            # print(hero_x, hero_y)
+            hero_y = self.y + self.padding + i * (self.v_int + self.badge_size)
             hero.badge.topleft = (hero_x, hero_y)
             hero.badge.draw()
             self.screen.draw.text(f"Q {hero.dex * 10}",
                                   midleft=(hero_x + self.badge_size * 1.5 + self.padding,
                                            hero_y + self.badge_size / 2))
+            if hero is self.cur_actor:
+                highlight = pygame.Surface((self.w - 2 * self.padding, self.badge_size))
+                highlight.set_alpha(40)
+                highlight.fill(c_green)
+                self.screen.blit(highlight, (hero_x, hero_y))
+
+                self.box = Rect((hero_x, hero_y),
+                                (self.w - 2 * self.padding, self.badge_size))
+                self.screen.draw.rect(self.box, c_green)
 
 
 class VertBar:
@@ -280,7 +293,8 @@ class BattleScreen:
         self.screen = screen
         self.skill_panel = SkillPanel(screen, padding, skills_panel_height, active_char, active_skill)
         self.info_panel = InfoPanel(screen, padding, info_panel_height, skills_panel_height)
-        self.queue_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height, everyone)
+        self.queue_panel = QueuePanel(screen, padding, q_panel_width, skills_panel_height, info_panel_height,
+                                      everyone, active_char)
         self.hero_panel = HeroPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, party,
                                active_char)
         self.enemy_panel = EnemyPanel(screen, padding, skills_panel_height, info_panel_height, q_panel_width, enemies,
@@ -298,8 +312,9 @@ class BattleScreen:
             else:
                 slot.set_normal()
 
-    def update_skill_panel(self, char):
+    def update(self, char):
         self.skill_panel.update_all(char)
+        self.queue_panel.update(char)
 
     def render(self):
         self.info_panel.render()

@@ -70,7 +70,7 @@ def next_turn():
         cur_actor = 0
 
     gui.highlight(everyone[cur_actor])
-    gui.update_skill_panel(everyone[cur_actor])
+    gui.update(everyone[cur_actor])
 
 
 def calc_damage(stat_value, weapon_dmg):
@@ -122,9 +122,6 @@ def perform(author, targets, skill):
         gui.skill_panel.set_active_skill(1)
 
         next_turn()
-
-        # gui.highlight(everyone[cur_actor])
-        # gui.update_skill_panel(everyone[cur_actor])
 
         message = f"{author} targets {targets} using {skill}. Now it's {everyone[cur_actor]}'s turn"
     else:
